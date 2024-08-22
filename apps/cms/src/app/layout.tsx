@@ -1,5 +1,6 @@
 import { ThemeProvider } from "next-themes";
-import "@/styles/globals.css";
+import "./globals.css";
+import { Toaster } from "@/components/ui/toaster";
 
 const layout = ({
   children,
@@ -16,6 +17,7 @@ const layout = ({
           disableTransitionOnChange
         >
           <main className="h-screen">{children}</main>
+          <Toaster />
         </ThemeProvider>
       </body>
     </html>

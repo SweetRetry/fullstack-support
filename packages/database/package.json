@@ -2,7 +2,9 @@
   "name": "@repo/database",
   "version": "1.0.0",
   "exports": {
-    ".": "./src/client.ts"
+    ".": "./src/client.ts",
+    "./services/*": "./src/services/*.ts",
+    "./types": "./src/types.ts"
   },
   "scripts": {
     "db:migrate:deploy": "prisma migrate deploy",
@@ -18,7 +20,9 @@
     "studio": "prisma studio"
   },
   "dependencies": {
-    "@prisma/client": "^5.10.2"
+    "@prisma/client": "^5.10.2",
+    "@types/jsonwebtoken": "^9.0.6",
+    "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
     "@repo/eslint-config": "workspace:*",

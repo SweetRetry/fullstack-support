@@ -6,43 +6,62 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
+import { login } from "@repo/database/services/auth";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
+const formSchema = z.object({
+  email: z.string().email().min(1, { message: "Email is required" }),
+  password: z.string().min(1, { message: "Password is required" }),
+});
 const UserAuthForm = () => {
   const form = useForm({
-    resolver: zodResolver(
-      z.object({
-        username: z.string(),
-        password: z.string(),
-      })
-    ),
+    resolver: zodResolver(formSchema),
     defaultValues: {
-      username: "",
+      email: "",
       password: "",
     },
   });
+
+  const router = useRouter();
+  const { toast } = useToast();
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    const res = await login(values);
+    if (res.data?.token) {
+      localStorage.setItem("token", JSON.stringify(res.data?.token));
+      router.push("/dashboard");
+    } else {
+      toast({
+        title: "Login Failed",
+        description: res.message,
+      });
+    }
+  };
   return (
     <section>
       <h2 className="font-bold text-2xl">Login</h2>
       <p className="text-sm text-muted-foreground mt-2 mb-4">
-        Enter your username below to login to your account
+        Enter your email below to login to your account
       </p>
       <Form {...form}>
-        <form className="space-y-4">
+        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
           <FormField
-            name="username"
+            name="email"
             control={form.control}
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Username</FormLabel>
+                <FormLabel>Email</FormLabel>
                 <FormControl>
                   <Input {...field} />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
@@ -56,6 +75,7 @@ const UserAuthForm = () => {
                 <FormControl>
                   <Input type="password" autoComplete="off" {...field} />
                 </FormControl>
+                <FormMessage />
               </FormItem>
             )}
           />
