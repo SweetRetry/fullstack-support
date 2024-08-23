@@ -1,6 +1,7 @@
-import {prisma} from "@repo/database";
+import { prisma } from "@repo/database";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { ArticleStatus } from "@repo/database/types/article";
 
 const CategoryMenu = async ({ categoryId }: { categoryId: string }) => {
   const categroyNames = await prisma.category.findMany({
@@ -11,7 +12,7 @@ const CategoryMenu = async ({ categoryId }: { categoryId: string }) => {
     where: {
       articles: {
         some: {
-          published: true,
+          status: ArticleStatus.Published,
         },
       },
     },

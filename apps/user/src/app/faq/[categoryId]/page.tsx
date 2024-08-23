@@ -15,6 +15,7 @@ import Link from "next/link";
 import React from "react";
 import CategoryMenu from "../_components/CategoryMenu";
 import { prisma } from "@repo/database";
+import { ArticleStatus } from "@repo/database/types/article";
 
 // const LocalTime = dynamic(() => import("@/components/LocalTime"), {
 //   ssr: false,
@@ -33,12 +34,12 @@ const page = async ({
     include: {
       articles: {
         where: {
-          published: true,
+          status: ArticleStatus.Published,
         },
         select: {
           id: true,
           title: true,
-          publishedAt: true,
+          updatedAt: true,
           description: true,
         },
       },
@@ -78,8 +79,7 @@ const page = async ({
 
                   <span className="text-muted-foreground">
                     {/* {article.publishedAt && <LocalTime time={article.publishedAt} />} */}
-                    {article.publishedAt &&
-                      formatToUtcTime(article.publishedAt)}
+                    {article.updatedAt && formatToUtcTime(article.updatedAt)}
                   </span>
                 </div>
                 <p className="whitespace-pre-line text-muted-foreground">

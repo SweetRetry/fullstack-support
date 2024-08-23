@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
       content: true,
       categoryId: true,
       Category: true,
-      publishedAt: true,
+      updatedAt: true,
     },
   });
 
@@ -75,7 +75,7 @@ const page = async ({ params }: { params: { id: string } }) => {
           <div className="mt-8">
             <h2 className="text-2xl font-bold">{post?.title}</h2>
             <p className="mt-2 text-muted-foreground">
-              {post.publishedAt && formatToUtcTime(post.publishedAt)}
+              {post.updatedAt && formatToUtcTime(post.updatedAt)}
             </p>
             <article
               dangerouslySetInnerHTML={{ __html: html }}

@@ -1,6 +1,6 @@
 import SectionWrap from "@/components/SectionWrap";
 import SearchContainer from "../../components/SearchContainer";
-import {prisma} from "@repo/database";
+import { ArticleStatus, prisma } from "@repo/database";
 
 import Link from "next/link";
 
@@ -9,7 +9,7 @@ export default async function Home() {
     where: {
       articles: {
         some: {
-          published: true,
+          status: ArticleStatus.PUBLISHED,
         },
       },
     },
