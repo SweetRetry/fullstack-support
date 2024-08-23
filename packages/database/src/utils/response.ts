@@ -1,11 +1,16 @@
-import { ResponseData } from "../types";
+
+export interface ResponseData<T = any> {
+  data: T;
+  code: number;
+  message: string;
+}
 
 export class IResponse {
-  static Success<T = any>(data: T): ResponseData<T> {
+  static Success<T = any>(data: T, message?: string): ResponseData<T> {
     return {
       code: 200,
       data: data,
-      message: "success",
+      message: message || "success",
     };
   }
 

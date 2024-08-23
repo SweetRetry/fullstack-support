@@ -15,7 +15,7 @@ model User {
   createdAt DateTime  @default(now())
   updatedAt DateTime?
   roleId    String?
-  role      Role?      @relation(fields: [roleId], references: [id])
+  role      Role?     @relation(fields: [roleId], references: [id])
 }
 
 model Role {
@@ -43,16 +43,20 @@ model Category {
   @@map("categories")
 }
 
+enum ArticleStatus {
+  DRAFT
+  PUBLISHED
+  DELETED
+}
+
 model Article {
-  id          String    @id @default(cuid())
+  id          String        @id @default(cuid())
   title       String
-  content     String    @db.Text
-  description String    @db.Text
-  savedAt     DateTime  @default(now()) @map("saved_at")
-  deleted     Boolean   @default(false)
-  deletedAt   DateTime? @map("deleted_at")
-  published   Boolean   @default(false)
-  publishedAt DateTime? @map("published_at")
-  Category    Category? @relation(fields: [categoryId], references: [id])
+  content     String        @db.Text
+  description String        @db.Text
+  status      ArticleStatus @default(DRAFT)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+  category    Category?     @relation(fields: [categoryId], references: [id])
   categoryId  String?
 }
