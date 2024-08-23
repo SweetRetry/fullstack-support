@@ -8,14 +8,13 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { formatToUtcTime } from "@/lib/dayjsExtend";
+import { formatToUtcTime } from "@/lib/dayjsUtil";
 
 import Link from "next/link";
 // import dynamic from "next/dynamic";
 import React from "react";
 import CategoryMenu from "../_components/CategoryMenu";
-import { prisma } from "@repo/database";
-import { ArticleStatus } from "@repo/database/types/article";
+import { ArticleStatus, prisma } from "@repo/database";
 
 // const LocalTime = dynamic(() => import("@/components/LocalTime"), {
 //   ssr: false,
@@ -34,7 +33,7 @@ const page = async ({
     include: {
       articles: {
         where: {
-          status: ArticleStatus.Published,
+          status: ArticleStatus.PUBLISHED,
         },
         select: {
           id: true,

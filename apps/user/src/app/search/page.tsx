@@ -9,11 +9,13 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { formatToUtcTime } from "@/lib/dayjsExtend";
-import { prisma } from "@repo/database";
-import { highlightSearchText } from "@/lib/stringUtil";
+
+import { ArticleStatus, prisma } from "@repo/database";
+
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { formatToUtcTime } from "@/lib/dayjsUtil";
+import { highlightSearchText } from "@/lib/stringUtil";
 
 const SearchPage = async ({
   searchParams,
@@ -36,18 +38,17 @@ const SearchPage = async ({
           },
         },
       ],
-
-      published: true,
+      status: ArticleStatus.PUBLISHED,
     },
     take: 10,
     select: {
       id: true,
       title: true,
       description: true,
-      publishedAt: true,
+      updatedAt: true,
       categoryId: true,
-      savedAt: true,
-      Category: {
+
+      category: {
         select: {
           name: true,
         },
@@ -89,9 +90,9 @@ const SearchPage = async ({
                 >
                   <div className="flex justify-between">
                     <h3>{article.title}</h3>
-                    {article.publishedAt && (
+                    {article.updatedAt && (
                       <span className="text-muted-foreground">
-                        {formatToUtcTime(article.publishedAt)}
+                        {formatToUtcTime(article.updatedAt)}
                       </span>
                     )}
                   </div>
@@ -100,12 +101,12 @@ const SearchPage = async ({
                     dangerouslySetInnerHTML={{
                       __html: highlightSearchText(
                         article.description,
-                        searchParams.q
+                        searchParams.q,
                       ),
                     }}
                   ></p>
                   <Link href={`/faq/${article.categoryId}`}>
-                    <Button size="sm">{article.Category?.name}</Button>
+                    <Button size="sm">{article.category?.name}</Button>
                   </Link>
                 </div>
               ))

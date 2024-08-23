@@ -8,7 +8,8 @@ import { createHeadlessEditor as _createHeadlessEditor } from "@lexical/headless
 
 import { JSDOM } from "jsdom";
 import { $generateHtmlFromNodes } from "@lexical/html";
-import { theme } from "@/app/editor/draft/[id]/theme";
+import { theme } from "./lexicalTheme";
+
 // import { htmlConfig } from "./htmlConfig";
 
 const createHeadlessEditor = ({ namespace }: { namespace?: string }) => {

@@ -1,7 +1,5 @@
 import { prisma } from "@repo/database";
 
-import { getHtml } from "@/lib/lexicalUtil";
-
 import CategoryMenu from "../../_components/CategoryMenu";
 import {
   Breadcrumb,
@@ -11,8 +9,9 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { formatToUtcTime } from "@/lib/dayjsExtend";
+import { formatToUtcTime } from "@/lib/dayjsUtil";
 import RealtedArticles from "./_components/RealtedArticles";
+import { getHtml } from "@/lib/lexicalUtil";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const data = await prisma.article.findUnique({
@@ -24,7 +23,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
       title: true,
       content: true,
       categoryId: true,
-      Category: true,
+      category: true,
       updatedAt: true,
     },
   });
@@ -63,7 +62,7 @@ const page = async ({ params }: { params: { id: string } }) => {
               <BreadcrumbSeparator />
               <BreadcrumbItem>
                 <BreadcrumbLink href={`/support/faq/${post.categoryId}`}>
-                  {post.Category?.name}
+                  {post.category?.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
