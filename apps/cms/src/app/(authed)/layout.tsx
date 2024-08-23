@@ -1,24 +1,41 @@
 "use client";
 import SiteFooter from "@/components/footer/SiteFooter";
 import SiteHeader from "@/components/header/SiteHeader";
-import { redirect } from "next/navigation";
+import { redirect, usePathname } from "next/navigation";
 import React from "react";
 import SiteMenu from "./_components/SiteMenu";
+import { LayoutDashboard, Book } from "lucide-react";
 
+const menus = [
+  {
+    name: "Dashboard",
+    icon: <LayoutDashboard />,
+    href: "/dashboard",
+  },
+  {
+    name: "Article",
+    icon: <Book />,
+    href: "/article",
+  },
+];
 const layout = ({ children }: { children: React.ReactNode }) => {
   const token = window.localStorage.getItem("token");
+  const pathname = usePathname();
+  const activePath = pathname.split("/")[1];
   if (token)
     return (
       <section className="flex h-full">
         <aside className="w-[200px] space-y-2 p-4">
           <h2 className="mb-4 text-2xl font-bold">SweetRetry</h2>
-          <SiteMenu />
+          <SiteMenu menus={menus} activePath={`/${activePath}`} />
         </aside>
         <main className="flex h-full w-full transform flex-col">
-          <SiteHeader />
+          <SiteHeader
+            name={menus.find((item) => item.href === `/${activePath}`)?.name}
+          />
 
           <main className="mt-16 flex flex-1 flex-col px-8">
-            <section className="flex-grow ">{children}</section>
+            <section className="flex-grow">{children}</section>
             <SiteFooter />
           </main>
         </main>

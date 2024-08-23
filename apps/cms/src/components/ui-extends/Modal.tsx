@@ -21,6 +21,8 @@ import { useSize } from "ahooks";
 
 import { X } from "lucide-react";
 import { Button } from "../ui/button";
+import { useState } from "react";
+import ButtonLoading from "./ButtonLoading";
 
 export function Modal({
   title,
@@ -92,11 +94,22 @@ interface UseModalConfig {
   content: string;
   description?: string | React.ReactNode;
   width?: string | number;
+  onConfirm: () => Promise<void> | void;
+  onCancel?: () => void;
+  danger?: boolean;
 }
 
 // 封装useModalHook
-export function useModal({ title, description, content }: UseModalConfig) {
-  const [open, setOpen] = React.useState(false);
+export function useModal({
+  title,
+  description,
+  content,
+  onConfirm,
+  onCancel,
+  danger,
+}: UseModalConfig) {
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const show = () => {
     setOpen(true);
@@ -105,7 +118,6 @@ export function useModal({ title, description, content }: UseModalConfig) {
   const close = () => {
     setOpen(false);
   };
-
   return {
     show,
     close,
@@ -118,8 +130,27 @@ export function useModal({ title, description, content }: UseModalConfig) {
       >
         <div>{content}</div>
         <div className="mt-4 flex justify-end gap-2">
-          <Button variant="secondary">取消</Button>
-          <Button>确认</Button>
+          <Button
+            variant="secondary"
+            onClick={() => {
+              setOpen(false);
+              onCancel && onCancel();
+            }}
+          >
+            Cancel
+          </Button>
+          <ButtonLoading
+            variant={danger ? "destructive" : "default"}
+            loading={loading}
+            onClick={async () => {
+              setLoading(true);
+              await onConfirm();
+              setLoading(false);
+              setOpen(false);
+            }}
+          >
+            Confirm
+          </ButtonLoading>
         </div>
       </Modal>
     ),

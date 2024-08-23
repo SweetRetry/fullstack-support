@@ -1,10 +1,10 @@
 import React from "react";
-import { useEffect, useLayoutEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Article, Category } from "@prisma/client";
+import { Article } from "@prisma/client";
 
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
@@ -93,7 +93,7 @@ function Editor({ id }: { id: string }) {
   const onSaveWrapper = () =>
     onSave({
       onSuccess(res) {
-        router.replace(`/editor/draft/${res.data.id}`);
+        router.replace(`/article`);
         setArticleId(res.data.id);
         toast({
           title,
@@ -119,8 +119,8 @@ function Editor({ id }: { id: string }) {
       categoryId,
       title,
       description: form.getValues("description"),
-      published: true,
-      publishedAt: new Date(),
+      status: "published",
+      updatedAt: new Date(),
     });
 
     if (res.code === 200) {
