@@ -7,7 +7,7 @@ import {
 import { useEffect } from "react";
 import Editor from "./_components/Editor";
 import "./theme.css";
-import { theme } from "./theme";
+import { theme } from "@/lib/lexicalTheme";
 
 // TODO：用户鉴权
 

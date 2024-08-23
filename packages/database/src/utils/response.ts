@@ -1,9 +1,4 @@
-
-export interface ResponseData<T = any> {
-  data: T;
-  code: number;
-  message: string;
-}
+import { ResponseData } from "../types/response";
 
 export class IResponse {
   static Success<T = any>(data: T, message?: string): ResponseData<T> {

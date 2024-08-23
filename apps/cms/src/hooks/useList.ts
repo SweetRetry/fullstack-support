@@ -1,7 +1,7 @@
 import { delay } from "@/lib/delay";
-import { ResponseData } from "@repo/database/types/response";
 import { useDebounceFn } from "ahooks";
 import { useCallback, useRef, useState } from "react";
+import { ResponseData } from "@repo/database/types/response";
 
 export const useList = <T, P extends Record<string, any> = Record<string, any>>(
   queryParams: Omit<P, "pageId" | "pageSize"> & {
