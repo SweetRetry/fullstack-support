@@ -16,4 +16,8 @@ export class IResponse {
       message,
     };
   }
+
+  static PermissionDenied(): ResponseData<null> {
+    return IResponse.Error(403, "Permission Denied");
+  }
 }

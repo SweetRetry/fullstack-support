@@ -35,6 +35,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
 }
 const getPost = async (id: string) => {
   const { data } = await generateMetadata({ params: { id } });
+
   return data;
 };
 
