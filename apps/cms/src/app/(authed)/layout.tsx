@@ -4,7 +4,8 @@ import SiteHeader from "@/components/header/SiteHeader";
 import { redirect, usePathname } from "next/navigation";
 import React from "react";
 import SiteMenu from "./_components/SiteMenu";
-import { LayoutDashboard, Book } from "lucide-react";
+import { LayoutDashboard, Book, User } from "lucide-react";
+import AuthProvider from "./_components/AuthProvider";
 
 const menus = [
   {
@@ -13,17 +14,24 @@ const menus = [
     href: "/dashboard",
   },
   {
-    name: "Article",
+    name: "Articles",
     icon: <Book />,
-    href: "/article",
+    href: "/articles",
+  },
+  {
+    name: "Roles",
+    icon: <User />,
+    href: "/roles",
   },
 ];
-const layout = ({ children }: { children: React.ReactNode }) => {
+const AuthedLayout = ({ children }: { children: React.ReactNode }) => {
   const token = window.localStorage.getItem("token");
+  if (!token) return redirect("/login");
   const pathname = usePathname();
   const activePath = pathname.split("/")[1];
-  if (token)
-    return (
+
+  return (
+    <AuthProvider token={token}>
       <section className="flex h-full">
         <aside className="w-[200px] space-y-2 p-4">
           <h2 className="mb-4 text-2xl font-bold">SweetRetry</h2>
@@ -40,10 +48,8 @@ const layout = ({ children }: { children: React.ReactNode }) => {
           </main>
         </main>
       </section>
-    );
-
-  return redirect("/login");
+    </AuthProvider>
+  );
 };
 
-export default layout;
-export const config = { ssr: false };
+export default AuthedLayout;

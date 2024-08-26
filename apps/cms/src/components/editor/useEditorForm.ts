@@ -2,7 +2,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { getExistArticle } from "../actions";
+import { getExistArticle } from "./actions";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
 export const useEditorForm = (articalId: string) => {

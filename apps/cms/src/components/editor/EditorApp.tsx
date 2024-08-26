@@ -4,31 +4,28 @@ import {
   InitialConfigType,
   LexicalComposer,
 } from "@lexical/react/LexicalComposer";
-import { useEffect } from "react";
-import Editor from "./_components/Editor";
+
 import "./theme.css";
 import { theme } from "@/lib/lexicalTheme";
-
-// TODO：用户鉴权
+import { HeadingNode } from "@lexical/rich-text";
+import { AutoLinkNode, LinkNode } from "@lexical/link";
+import EditorForm from "./EditorForm";
 
 const editorConfig: InitialConfigType = {
-  namespace: "WritePost",
+  namespace: "Article Editor",
 
   onError(error: Error) {
     throw error;
   },
 
   theme,
+  nodes: [HeadingNode, AutoLinkNode, LinkNode],
 };
 
-export default function WriteApp({ params }: { params: { id: string } }) {
-  useEffect(() => {
-    document.title = "Write article | Retry";
-  });
-
+export default function EditorApp({ id }: { id: string }) {
   return (
     <LexicalComposer initialConfig={editorConfig}>
-      <Editor id={params.id} />
+      <EditorForm id={id} />
     </LexicalComposer>
   );
 }

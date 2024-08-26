@@ -8,11 +8,11 @@
 export const theme = {
   code: "editor-code",
   heading: {
-    h1: "editor-heading-h1",
-    h2: "editor-heading-h2",
-    h3: "editor-heading-h3",
-    h4: "editor-heading-h4",
-    h5: "editor-heading-h5",
+    h1: "text-foreground font-bold text-5xl",
+    h2: "text-foreground font-bold text-4xl",
+    h3: "text-foreground font-bold text-3xl",
+    h4: "text-foreground font-bold text-2xl",
+    h5: "text-foreground font-bold text-xl",
   },
   image: "editor-image",
   link: "editor-link",

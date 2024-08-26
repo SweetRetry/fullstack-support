@@ -12,10 +12,3 @@ export const formatToUtcTime = (originalDate: Date | string) => {
   return utcTime;
 };
 // 获取用户时区时间
-export const formatLocalTime = (originalDate: Date | string) => {
-  const localTime = dayjs(originalDate)
-    .tz(dayjs.tz.guess())
-    .format("YYYY-MM-DD HH:mm:ss");
-
-  return localTime;
-};

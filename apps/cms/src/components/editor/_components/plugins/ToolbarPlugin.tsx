@@ -12,34 +12,45 @@ import {
   $isRangeSelection,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
-  FORMAT_ELEMENT_COMMAND,
+  COMMAND_PRIORITY_CRITICAL,
+  COMMAND_PRIORITY_NORMAL,
   FORMAT_TEXT_COMMAND,
+  KEY_MODIFIER_COMMAND,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND,
 } from "lexical";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
+import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
 
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
 import {
-  AlignCenter,
-  AlignJustify,
-  AlignLeft,
-  AlignRight,
   Bold,
   Italic,
+  Link,
   Redo,
   Strikethrough,
   Underline,
   Undo,
 } from "lucide-react";
+import { CustomHeadingActions } from "./HeadingActions";
+import AlignPlugin from "./AlignPlugin";
+import { cn } from "@/lib/utils";
+import { sanitizeUrl } from "@/lib/url";
+import { getSelectedNode } from "@/lib/getSelectedNode";
 
 const LowPriority = 1;
 
-export default function ToolbarPlugin() {
+export default function ToolbarPlugin({
+  setIsLinkEditMode,
+}: {
+  setIsLinkEditMode: Dispatch<boolean>;
+}) {
   const [editor] = useLexicalComposerContext();
+  const [activeEditor, setActiveEditor] = useState(editor);
+
   const toolbarRef = useRef(null);
   const [canUndo, setCanUndo] = useState(false);
   const [canRedo, setCanRedo] = useState(false);
@@ -47,6 +58,8 @@ export default function ToolbarPlugin() {
   const [isItalic, setIsItalic] = useState(false);
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
+  const [isLink, setIsLink] = useState(false);
+  const [isEditable, setIsEditable] = useState(() => editor.isEditable());
 
   const $updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -56,42 +69,102 @@ export default function ToolbarPlugin() {
       setIsItalic(selection.hasFormat("italic"));
       setIsUnderline(selection.hasFormat("underline"));
       setIsStrikethrough(selection.hasFormat("strikethrough"));
+
+      // Update links
+      const node = getSelectedNode(selection);
+      const parent = node.getParent();
+      if ($isLinkNode(parent) || $isLinkNode(node)) {
+        setIsLink(true);
+      } else {
+        setIsLink(false);
+      }
     }
   }, []);
 
   useEffect(() => {
+    return editor.registerCommand(
+      SELECTION_CHANGE_COMMAND,
+      (_payload, newEditor) => {
+        setActiveEditor(newEditor);
+        $updateToolbar();
+        return false;
+      },
+      COMMAND_PRIORITY_CRITICAL,
+    );
+  }, [editor, $updateToolbar]);
+
+  useEffect(() => {
+    activeEditor.getEditorState().read(() => {
+      $updateToolbar();
+    });
+  }, [activeEditor, $updateToolbar]);
+
+  useEffect(() => {
     return mergeRegister(
-      editor.registerUpdateListener(({ editorState }) => {
+      editor.registerEditableListener((editable) => {
+        setIsEditable(editable);
+      }),
+      activeEditor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
           $updateToolbar();
         });
       }),
-      editor.registerCommand(
-        SELECTION_CHANGE_COMMAND,
-        (_payload, _newEditor) => {
-          $updateToolbar();
-          return false;
-        },
-        LowPriority,
-      ),
-      editor.registerCommand(
+      activeEditor.registerCommand<boolean>(
         CAN_UNDO_COMMAND,
         (payload) => {
           setCanUndo(payload);
           return false;
         },
-        LowPriority,
+        COMMAND_PRIORITY_CRITICAL,
       ),
-      editor.registerCommand(
+      activeEditor.registerCommand<boolean>(
         CAN_REDO_COMMAND,
         (payload) => {
           setCanRedo(payload);
           return false;
         },
-        LowPriority,
+        COMMAND_PRIORITY_CRITICAL,
       ),
     );
-  }, [editor, $updateToolbar]);
+  }, [$updateToolbar, activeEditor, editor]);
+
+  useEffect(() => {
+    return activeEditor.registerCommand(
+      KEY_MODIFIER_COMMAND,
+      (payload) => {
+        const event: KeyboardEvent = payload;
+        const { code, ctrlKey, metaKey } = event;
+
+        if (code === "KeyK" && (ctrlKey || metaKey)) {
+          event.preventDefault();
+          let url: string | null;
+          if (!isLink) {
+            setIsLinkEditMode(true);
+            url = sanitizeUrl("https://");
+          } else {
+            setIsLinkEditMode(false);
+            url = null;
+          }
+          return activeEditor.dispatchCommand(TOGGLE_LINK_COMMAND, url);
+        }
+        return false;
+      },
+      COMMAND_PRIORITY_NORMAL,
+    );
+  }, [activeEditor, isLink, setIsLinkEditMode]);
+
+  const insertLink = useCallback(() => {
+    if (!isLink) {
+      setIsLinkEditMode(true);
+      activeEditor.dispatchCommand(
+        TOGGLE_LINK_COMMAND,
+        sanitizeUrl("https://"),
+      );
+    } else {
+      setIsLinkEditMode(false);
+      activeEditor.dispatchCommand(TOGGLE_LINK_COMMAND, null);
+    }
+  }, [activeEditor, isLink, setIsLinkEditMode]);
 
   return (
     <div className="flex h-12 items-center gap-2 p-2" ref={toolbarRef}>
@@ -120,6 +193,7 @@ export default function ToolbarPlugin() {
       </Button>
 
       <Separator orientation="vertical" />
+      <CustomHeadingActions />
 
       <Button
         variant="ghost"
@@ -127,7 +201,7 @@ export default function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_TEXT_COMMAND, "bold");
         }}
-        className={"toolbar-item " + (isBold ? "active" : "")}
+        className={cn({ "bg-muted": isBold })}
         aria-label="Format Bold"
       >
         <Bold width={20} height={20} />
@@ -138,7 +212,7 @@ export default function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_TEXT_COMMAND, "italic");
         }}
-        className={"toolbar-item " + (isItalic ? "active" : "")}
+        className={cn({ "bg-muted": isItalic })}
         aria-label="Format Italics"
       >
         <Italic width={20} height={20} />
@@ -149,7 +223,7 @@ export default function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_TEXT_COMMAND, "underline");
         }}
-        className={"toolbar-item " + (isUnderline ? "active" : "")}
+        className={cn({ "bg-muted": isUnderline })}
         aria-label="Format Underline"
       >
         <Underline width={20} height={20} />
@@ -160,51 +234,21 @@ export default function ToolbarPlugin() {
         onClick={() => {
           editor.dispatchCommand(FORMAT_TEXT_COMMAND, "strikethrough");
         }}
-        className={"toolbar-item " + (isStrikethrough ? "active" : "")}
+        className={cn({ "bg-muted": isStrikethrough })}
         aria-label="Format Strikethrough"
       >
         <Strikethrough width={20} height={20} />
       </Button>
       <Separator orientation="vertical" className="h-full" />
+      <AlignPlugin />
+      <Separator orientation="vertical" className="h-full" />
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left");
-        }}
-        aria-label="Left Align"
-      >
-        <AlignLeft width={20} height={20} />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center");
-        }}
-        aria-label="Center Align"
-      >
-        <AlignCenter width={20} height={20} />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right");
-        }}
-        aria-label="Right Align"
-      >
-        <AlignRight width={20} height={20} />
-      </Button>
-      <Button
-        variant="ghost"
-        size="icon"
-        onClick={() => {
-          editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify");
-        }}
+        onClick={insertLink}
         aria-label="Justify Align"
       >
-        <AlignJustify width={20} height={20} />
+        <Link width={20} height={20} />
       </Button>
     </div>
   );

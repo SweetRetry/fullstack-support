@@ -9,9 +9,8 @@ import { Button } from "@/components/ui/button";
 import { FilterIcon, PlusCircleIcon } from "lucide-react";
 import { DataTable } from "./data-table";
 import { useColumns } from "./columns";
-import { useRouter } from "next/navigation";
 import { ArticleStatus } from "@prisma/client";
-import { useModal } from "@/components/ui-extends/Modal";
+import { Modal, useModal } from "@/components/ui-extends/Modal";
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
@@ -19,6 +18,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
+import ArticleViewer from "./ArticleViewer";
+import Link from "next/link";
 
 const page = () => {
   const [keyword, setKeyword] = useState("");
@@ -32,6 +33,8 @@ const page = () => {
 
   const [actionArticleItem, setActionArticleItem] =
     useState<(typeof data)["0"]>();
+
+  const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -71,13 +74,16 @@ const page = () => {
       setActionArticleItem(item);
       show();
     },
+    onOpenPreviewModal: (item) => {
+      setActionArticleItem(item);
+      setPreviewModalOpen(true);
+    },
   });
 
   useEffect(() => {
     fetch();
   }, []);
 
-  const router = useRouter();
   return (
     <div className="p-4">
       {contextHandler}
@@ -121,10 +127,12 @@ const page = () => {
               ))}
             </DropdownMenuContent>
           </DropdownMenu>
-          <Button onClick={() => router.push("/article/editor/draft/new")}>
-            <PlusCircleIcon className="mr-1" width={20} height={20} />
-            <span>Add Article</span>
-          </Button>
+          <Link href="/articles/editor/draft/new">
+            <Button>
+              <PlusCircleIcon className="mr-1" width={20} height={20} />
+              <span>Add Article</span>
+            </Button>
+          </Link>
         </div>
       </div>
       <DataTable
@@ -134,6 +142,15 @@ const page = () => {
         totalCount={totalCount}
         totalPage={totalPage}
       />
+
+      <Modal
+        open={previewModalOpen}
+        setOpen={setPreviewModalOpen}
+        title="Preview"
+        width={800}
+      >
+        <ArticleViewer id={actionArticleItem?.id} />
+      </Modal>
     </div>
   );
 };

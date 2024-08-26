@@ -23,6 +23,7 @@ import { X } from "lucide-react";
 import { Button } from "../ui/button";
 import { useState } from "react";
 import ButtonLoading from "./ButtonLoading";
+import { cn } from "@/lib/utils";
 
 export function Modal({
   title,
@@ -32,6 +33,7 @@ export function Modal({
   children,
   trigger,
   width,
+  limitHeight,
 }: {
   title: string;
   open: boolean;
@@ -40,6 +42,7 @@ export function Modal({
   children: React.ReactNode;
   trigger?: React.ReactNode;
   width?: string | number;
+  limitHeight?: boolean;
 }) {
   const size = useSize(() => document.querySelector("body"));
 
@@ -54,7 +57,11 @@ export function Modal({
       <Dialog open={open} onOpenChange={setOpen}>
         {trigger && <DialogTrigger asChild>{trigger}</DialogTrigger>}
         <DialogContent
-          style={{ width: dialogWidth, minWidth: dialogWidth }}
+          style={{
+            width: dialogWidth,
+            minWidth: dialogWidth,
+            maxWidth: size?.width,
+          }}
           className="p-0 text-sm"
         >
           <DialogHeader className="px-6 pt-6">
@@ -64,7 +71,13 @@ export function Modal({
             )}
           </DialogHeader>
 
-          <div className="max-h-[75vh] overflow-auto p-6 pt-0">{children}</div>
+          <div
+            className={cn("p-6 pt-0", {
+              "max-h-[80vh] overflow-auto": limitHeight,
+            })}
+          >
+            {children}
+          </div>
         </DialogContent>
       </Dialog>
     );
@@ -83,7 +96,7 @@ export function Modal({
           </div>
           {description && <DrawerDescription>{description}</DrawerDescription>}
         </DrawerHeader>
-        <div className="max-h-[75vh] overflow-auto p-4">{children}</div>
+        <div className="max-h-[90vh] overflow-auto p-4">{children}</div>
       </DrawerContent>
     </Drawer>
   );

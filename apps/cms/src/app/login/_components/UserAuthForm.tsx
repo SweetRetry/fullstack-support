@@ -46,8 +46,8 @@ const UserAuthForm = () => {
   };
   return (
     <section>
-      <h2 className="font-bold text-2xl">Login</h2>
-      <p className="text-sm text-muted-foreground mt-2 mb-4">
+      <h2 className="text-2xl font-bold">Login</h2>
+      <p className="mb-4 mt-2 text-sm text-muted-foreground">
         Enter your email below to login to your account
       </p>
       <Form {...form}>
@@ -80,7 +80,9 @@ const UserAuthForm = () => {
             )}
           />
 
-          <Button className="block w-full">Login</Button>
+          <Button className="block w-full" type="submit">
+            Login
+          </Button>
         </form>
       </Form>
     </section>

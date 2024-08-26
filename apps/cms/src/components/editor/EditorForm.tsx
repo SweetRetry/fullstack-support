@@ -1,21 +1,14 @@
 import React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Article } from "@prisma/client";
+import { Article, ArticleStatus } from "@prisma/client";
 
-import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { Modal } from "@/components/ui-extends/Modal";
 import CategorySelect from "@/components/category/CategorySelect";
-import ToolbarPlugin from "./plugins/ToolbarPlugin";
-import { postSaveActical, putUpdateArticle } from "../actions";
+
 import { $getRoot } from "lexical";
 
 import {
@@ -27,11 +20,13 @@ import {
   FormLabel,
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
-import { useEditorForm } from "./useEditorForm";
 
 import { useWindowUnload } from "@/hooks/useWindowUnload";
+import Editor from "./_components/Editor";
+import { useEditorForm } from "./useEditorForm";
+import { postSaveActical, putUpdateArticle } from "./actions";
 
-function Editor({ id }: { id: string }) {
+function EditorForm({ id }: { id: string }) {
   const { form, title, categoryId, editor } = useEditorForm(id);
 
   const [articleId, setArticleId] = useState(id === "new" ? "" : id);
@@ -119,7 +114,7 @@ function Editor({ id }: { id: string }) {
       categoryId,
       title,
       description: form.getValues("description"),
-      status: "published",
+      status: ArticleStatus.PUBLISHED,
       updatedAt: new Date(),
     });
 
@@ -129,7 +124,7 @@ function Editor({ id }: { id: string }) {
     }
   };
 
-  useWindowUnload();
+  // useWindowUnload();
 
   return (
     <main className="container rounded bg-background">
@@ -150,27 +145,7 @@ function Editor({ id }: { id: string }) {
       </header>
 
       <section className="rounded-0">
-        <div className="flex w-full items-center justify-between border-y border-solid border-border">
-          <ToolbarPlugin />
-        </div>
-        <div className="editor-inner">
-          <RichTextPlugin
-            contentEditable={
-              <ContentEditable
-                className="editor-input"
-                aria-placeholder="Enter some rich text..."
-                placeholder={
-                  <div className="editor-placeholder">
-                    Enter some rich text...
-                  </div>
-                }
-              />
-            }
-            ErrorBoundary={LexicalErrorBoundary}
-          />
-          <HistoryPlugin />
-          <AutoFocusPlugin />
-        </div>
+        <Editor />
       </section>
 
       <Modal title="Select category" open={open} setOpen={setOpen}>
@@ -257,4 +232,4 @@ function Editor({ id }: { id: string }) {
   );
 }
 
-export default Editor;
+export default EditorForm;

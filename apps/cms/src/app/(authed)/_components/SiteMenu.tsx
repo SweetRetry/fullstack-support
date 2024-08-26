@@ -12,9 +12,9 @@ const SiteMenu = ({
   activePath: string;
 }) => {
   return (
-    <ul className="space-y-4">
+    <ul className="space-y-2">
       {menus.map((menu) => (
-        <li>
+        <li key={menu.href}>
           <Link
             href={menu.href}
             className={cn(
