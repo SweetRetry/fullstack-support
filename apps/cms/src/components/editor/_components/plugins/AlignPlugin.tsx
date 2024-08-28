@@ -6,73 +6,79 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { FORMAT_ELEMENT_COMMAND } from "lexical";
+import { ElementFormatType, FORMAT_ELEMENT_COMMAND } from "lexical";
 import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react";
 import React from "react";
 
-const AlignPlugin = () => {
+const elementFormatType: Record<
+  Exclude<ElementFormatType, "">,
+  { icon: JSX.Element; label: string; iconRTL: JSX.Element }
+> = {
+  left: {
+    icon: <AlignLeft />,
+    iconRTL: <AlignLeft />,
+    label: "Left Align",
+  },
+  center: {
+    icon: <AlignCenter />,
+    iconRTL: <AlignCenter />,
+    label: "Center Align",
+  },
+  right: {
+    icon: <AlignRight />,
+    iconRTL: <AlignRight />,
+    label: "Right Align",
+  },
+  justify: {
+    icon: <AlignJustify />,
+    iconRTL: <AlignJustify />,
+    label: "Justify Align",
+  },
+  start: {
+    icon: <AlignLeft />,
+    iconRTL: <AlignRight />,
+    label: "Start Align",
+  },
+  end: {
+    icon: <AlignRight />,
+    iconRTL: <AlignLeft />,
+    label: "End Align",
+  },
+};
+const AlignPlugin = ({
+  elementFormat,
+  isRTL,
+}: {
+  elementFormat: ElementFormatType;
+  isRTL: boolean;
+}) => {
   const [editor] = useLexicalComposerContext();
-
+  const formatOption = elementFormatType[elementFormat || "left"];
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm">
-          Align
+        <Button variant="ghost" size="sm" className="capitalize">
+          <span className="mr-1">{formatOption.icon}</span>
+          {formatOption.label}
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem>
-          <Button
-            variant="ghost"
-            size="sm"
+        {Object.entries(elementFormatType).map(([key, value]) => (
+          <DropdownMenuItem
+            key={key}
             onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "left");
+              editor.dispatchCommand(
+                FORMAT_ELEMENT_COMMAND,
+                key as ElementFormatType,
+              );
             }}
-            aria-label="Left Align"
           >
-            <AlignLeft width={20} height={20} />
-            <span className="ml-1"> Left Align</span>
-          </Button>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "center");
-            }}
-            aria-label="Center Align"
-          >
-            <AlignCenter width={20} height={20} />
-            <span className="ml-1">Center Align</span>
-          </Button>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "right");
-            }}
-            aria-label="Right Align"
-          >
-            <AlignRight width={20} height={20} />
-            <span className="ml-1">Right Align</span>
-          </Button>
-        </DropdownMenuItem>
-        <DropdownMenuItem>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => {
-              editor.dispatchCommand(FORMAT_ELEMENT_COMMAND, "justify");
-            }}
-            aria-label="Justify Align"
-          >
-            <AlignJustify width={20} height={20} />
-            <span className="ml-1">Justify Align</span>
-          </Button>
-        </DropdownMenuItem>
+            <Button variant="ghost" size="sm">
+              {isRTL ? value.iconRTL : value.icon}
+              <span className="ml-1">{value.label}</span>
+            </Button>
+          </DropdownMenuItem>
+        ))}
       </DropdownMenuContent>
     </DropdownMenu>
   );

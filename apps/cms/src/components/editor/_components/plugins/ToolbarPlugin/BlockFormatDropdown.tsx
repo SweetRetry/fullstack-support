@@ -73,9 +73,6 @@ export const BlockFormatDropdown = ({
   };
 
   const onFormat = (type: BlockType) => {
-    console.log("🚀 ~ onFormat ~ blockType:", type);
-    console.log(blockType);
-
     if (["h1", "h2", "h3"].includes(type)) {
       // HeadingTagType
       editor.update(() => {

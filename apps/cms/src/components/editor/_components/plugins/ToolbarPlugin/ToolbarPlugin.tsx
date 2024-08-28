@@ -13,11 +13,13 @@ import {
 } from "@lexical/utils";
 import {
   $getSelection,
+  $isElementNode,
   $isRangeSelection,
   $isRootOrShadowRoot,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
+  ElementFormatType,
   FORMAT_TEXT_COMMAND,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
@@ -46,6 +48,7 @@ import { sanitizeUrl } from "@/lib/url";
 import { getSelectedNode } from "@/lib/getSelectedNode";
 import { $isHeadingNode } from "@lexical/rich-text";
 import { BlockType, blockTypeToBlockNameMap } from ".";
+import { $isParentElementRTL } from "@lexical/selection";
 
 export default function ToolbarPlugin({
   setIsLinkEditMode,
@@ -64,6 +67,8 @@ export default function ToolbarPlugin({
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isLink, setIsLink] = useState(false);
   const [blockType, setBlockType] = useState<BlockType>("paragraph");
+  const [elementFormat, setElementFormat] = useState<ElementFormatType>("left");
+  const [isRTL, setIsRTL] = useState(false);
 
   const $updateToolbar = useCallback(() => {
     const selection = $getSelection();
@@ -89,6 +94,7 @@ export default function ToolbarPlugin({
       setIsItalic(selection.hasFormat("italic"));
       setIsUnderline(selection.hasFormat("underline"));
       setIsStrikethrough(selection.hasFormat("strikethrough"));
+      setIsRTL($isParentElementRTL(selection));
 
       // Update links
       const node = getSelectedNode(selection);
@@ -119,6 +125,33 @@ export default function ToolbarPlugin({
           }
         }
       }
+
+      let matchingParent;
+      if ($isLinkNode(parent)) {
+        // If node is a link, we need to fetch the parent paragraph node to set format
+        matchingParent = $findMatchingParent(
+          node,
+          (parentNode) => $isElementNode(parentNode) && !parentNode.isInline(),
+        );
+      }
+
+      // If matchingParent is a valid node, pass it's format type
+      setElementFormat(
+        $isElementNode(matchingParent)
+          ? matchingParent.getFormatType()
+          : $isElementNode(node)
+            ? node.getFormatType()
+            : parent?.getFormatType() || "left",
+      );
+
+      // If matchingParent is a valid node, pass it's format type
+      setElementFormat(
+        $isElementNode(matchingParent)
+          ? matchingParent.getFormatType()
+          : $isElementNode(node)
+            ? node.getFormatType()
+            : parent?.getFormatType() || "left",
+      );
     }
   }, [activeEditor, editor]);
 
@@ -253,9 +286,6 @@ export default function ToolbarPlugin({
       >
         <Strikethrough width={20} height={20} />
       </Button>
-      <Separator orientation="vertical" className="h-full" />
-      <AlignPlugin />
-      <Separator orientation="vertical" className="h-full" />
       <Button
         variant="ghost"
         size="icon"
@@ -264,6 +294,12 @@ export default function ToolbarPlugin({
       >
         <Link width={20} height={20} />
       </Button>
+
+      <Separator orientation="vertical" className="h-full" />
+
+      <AlignPlugin elementFormat={elementFormat} isRTL={isRTL} />
+      
+      <Separator orientation="vertical" className="h-full" />
     </div>
   );
 }

@@ -28,7 +28,6 @@ import {
   SELECTION_CHANGE_COMMAND,
 } from "lexical";
 import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
-import * as React from "react";
 import { createPortal } from "react-dom";
 
 import { getSelectedNode } from "@/lib/getSelectedNode";
@@ -113,29 +112,29 @@ function FloatingLinkEditor({
     return true;
   }, [anchorElem, editor, setIsLinkEditMode, isLinkEditMode, linkUrl]);
 
-  useEffect(() => {
-    const scrollerElem = anchorElem.parentElement;
+  // useEffect(() => {
+  //   const scrollerElem = anchorElem.parentElement;
 
-    const update = () => {
-      editor.getEditorState().read(() => {
-        $updateLinkEditor();
-      });
-    };
+  //   const update = () => {
+  //     editor.getEditorState().read(() => {
+  //       $updateLinkEditor();
+  //     });
+  //   };
 
-    window.addEventListener("resize", update);
+  //   window.addEventListener("resize", update);
 
-    if (scrollerElem) {
-      scrollerElem.addEventListener("scroll", update);
-    }
+  //   if (scrollerElem) {
+  //     scrollerElem.addEventListener("scroll", update);
+  //   }
 
-    return () => {
-      window.removeEventListener("resize", update);
+  //   return () => {
+  //     window.removeEventListener("resize", update);
 
-      if (scrollerElem) {
-        scrollerElem.removeEventListener("scroll", update);
-      }
-    };
-  }, [anchorElem.parentElement, editor, $updateLinkEditor]);
+  //     if (scrollerElem) {
+  //       scrollerElem.removeEventListener("scroll", update);
+  //     }
+  //   };
+  // }, [anchorElem.parentElement, editor, $updateLinkEditor]);
 
   useEffect(() => {
     return mergeRegister(
@@ -218,14 +217,14 @@ function FloatingLinkEditor({
   return (
     <div
       ref={editorRef}
-      className="absolute left-0 top-0 z-10 flex items-center rounded bg-white shadow px-3 w-[300px]"
+      className="absolute left-0 top-0 z-10 flex w-[300px] items-center rounded bg-background px-3 shadow"
     >
       {!isLink ? null : isLinkEditMode ? (
         <>
           <Input
             ref={inputRef}
             value={editedLinkUrl}
-            className="border-none bg-muted my-2 mr-2"
+            className="my-2 mr-2 border-none bg-muted"
             onChange={(event) => {
               setEditedLinkUrl(event.target.value);
             }}
@@ -253,16 +252,16 @@ function FloatingLinkEditor({
           </div>
         </>
       ) : (
-        <div className="flex items-center justify-between px-3 w-full">
+        <div className="flex w-full items-center justify-between px-3">
           <a
             href={sanitizeUrl(linkUrl)}
             target="_blank"
             rel="noopener noreferrer"
-            className="block my-2 mr-2 flex-1 underline text-primary"
+            className="my-2 mr-2 block flex-1 text-primary underline"
           >
             {linkUrl}
           </a>
-          <div className="flex gap-2 items-center">
+          <div className="flex items-center gap-2">
             <Edit
               className="cursor-pointer"
               width={16}

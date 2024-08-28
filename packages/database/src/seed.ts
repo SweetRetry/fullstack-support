@@ -16,6 +16,13 @@ async function main() {
     createPermission("article:review", "Reviewing Article"),
     createPermission("article:publish", "Publishing Article"),
     createPermission("article:delete", "Deleting Article"),
+    createPermission("role:create", "Creating Role"),
+    createPermission("role:edit", "Editing Role"),
+    createPermission("role:delete", "Deleting Role"),
+    createPermission("user:create", "Creating User"),
+    createPermission("user:edit", "Editing User"),
+    createPermission("user:delete", "Deleting User"),
+    createPermission("user:resetPassword", "Resetting Password"),
   ]);
 
   // 创建角色
