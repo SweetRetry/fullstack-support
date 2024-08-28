@@ -2,17 +2,18 @@ import React from "react";
 import { useState } from "react";
 
 import { AutoFocusPlugin } from "@lexical/react/LexicalAutoFocusPlugin";
-
+import { ListPlugin } from "@lexical/react/LexicalListPlugin";
+import { CheckListPlugin } from "@lexical/react/LexicalCheckListPlugin";
 import { ContentEditable } from "@lexical/react/LexicalContentEditable";
 import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
 import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { HistoryPlugin } from "@lexical/react/LexicalHistoryPlugin";
 
-import ToolbarPlugin from "./plugins/ToolbarPlugin";
+import ToolbarPlugin from "./plugins/ToolbarPlugin/ToolbarPlugin";
 
 import LexicalAutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import FloatingLinkEditorPlugin from "./plugins/FloatingLinkEditorPlugin";
-import TreeViewPlugin from "./plugins/TreeViewPlugin";
+// import TreeViewPlugin from "./plugins/TreeViewPlugin";
 import LinkPlugin from "./plugins/LinkPlugin";
 
 function Editor() {
@@ -52,7 +53,9 @@ function Editor() {
         <HistoryPlugin />
         <AutoFocusPlugin />
         <LexicalAutoLinkPlugin />
-        
+        <ListPlugin />
+        <CheckListPlugin />
+
         <LinkPlugin />
         {/* 必須安裝LinkPlugin才可使用 */}
         {floatingAnchorElem && (
@@ -62,7 +65,7 @@ function Editor() {
             setIsLinkEditMode={setIsLinkEditMode}
           />
         )}
-        <TreeViewPlugin />
+        {/* <TreeViewPlugin /> */}
       </div>
     </section>
   );

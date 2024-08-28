@@ -6,20 +6,24 @@
  *
  */
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
-import { mergeRegister } from "@lexical/utils";
+import {
+  $findMatchingParent,
+  $getNearestNodeOfType,
+  mergeRegister,
+} from "@lexical/utils";
 import {
   $getSelection,
   $isRangeSelection,
+  $isRootOrShadowRoot,
   CAN_REDO_COMMAND,
   CAN_UNDO_COMMAND,
   COMMAND_PRIORITY_CRITICAL,
-  COMMAND_PRIORITY_NORMAL,
   FORMAT_TEXT_COMMAND,
-  KEY_MODIFIER_COMMAND,
   REDO_COMMAND,
   SELECTION_CHANGE_COMMAND,
   UNDO_COMMAND,
 } from "lexical";
+import { $isListNode, ListNode } from "@lexical/list";
 import { $isLinkNode, TOGGLE_LINK_COMMAND } from "@lexical/link";
 import { Dispatch, useCallback, useEffect, useRef, useState } from "react";
 
@@ -35,13 +39,13 @@ import {
   Underline,
   Undo,
 } from "lucide-react";
-import { CustomHeadingActions } from "./HeadingActions";
-import AlignPlugin from "./AlignPlugin";
+import { BlockFormatDropdown } from "./BlockFormatDropdown";
+import AlignPlugin from "../AlignPlugin";
 import { cn } from "@/lib/utils";
 import { sanitizeUrl } from "@/lib/url";
 import { getSelectedNode } from "@/lib/getSelectedNode";
-
-const LowPriority = 1;
+import { $isHeadingNode } from "@lexical/rich-text";
+import { BlockType, blockTypeToBlockNameMap } from ".";
 
 export default function ToolbarPlugin({
   setIsLinkEditMode,
@@ -59,11 +63,27 @@ export default function ToolbarPlugin({
   const [isUnderline, setIsUnderline] = useState(false);
   const [isStrikethrough, setIsStrikethrough] = useState(false);
   const [isLink, setIsLink] = useState(false);
-  const [isEditable, setIsEditable] = useState(() => editor.isEditable());
+  const [blockType, setBlockType] = useState<BlockType>("paragraph");
 
   const $updateToolbar = useCallback(() => {
     const selection = $getSelection();
     if ($isRangeSelection(selection)) {
+      const anchorNode = selection.anchor.getNode();
+      let element =
+        anchorNode.getKey() === "root"
+          ? anchorNode
+          : $findMatchingParent(anchorNode, (e) => {
+              const parent = e.getParent();
+              return parent !== null && $isRootOrShadowRoot(parent);
+            });
+
+      if (element === null) {
+        element = anchorNode.getTopLevelElementOrThrow();
+      }
+
+      const elementKey = element.getKey();
+      const elementDOM = activeEditor.getElementByKey(elementKey);
+
       // Update text format
       setIsBold(selection.hasFormat("bold"));
       setIsItalic(selection.hasFormat("italic"));
@@ -78,8 +98,29 @@ export default function ToolbarPlugin({
       } else {
         setIsLink(false);
       }
+
+      // Update blockType
+      if (elementDOM !== null) {
+        if ($isListNode(element)) {
+          const parentList = $getNearestNodeOfType<ListNode>(
+            anchorNode,
+            ListNode,
+          );
+          const type = parentList
+            ? parentList.getListType()
+            : element.getListType();
+          setBlockType(type);
+        } else {
+          const type = $isHeadingNode(element)
+            ? element.getTag()
+            : element.getType();
+          if (type in blockTypeToBlockNameMap) {
+            setBlockType(type as BlockType);
+          }
+        }
+      }
     }
-  }, []);
+  }, [activeEditor, editor]);
 
   useEffect(() => {
     return editor.registerCommand(
@@ -101,9 +142,6 @@ export default function ToolbarPlugin({
 
   useEffect(() => {
     return mergeRegister(
-      editor.registerEditableListener((editable) => {
-        setIsEditable(editable);
-      }),
       activeEditor.registerUpdateListener(({ editorState }) => {
         editorState.read(() => {
           $updateToolbar();
@@ -127,31 +165,6 @@ export default function ToolbarPlugin({
       ),
     );
   }, [$updateToolbar, activeEditor, editor]);
-
-  useEffect(() => {
-    return activeEditor.registerCommand(
-      KEY_MODIFIER_COMMAND,
-      (payload) => {
-        const event: KeyboardEvent = payload;
-        const { code, ctrlKey, metaKey } = event;
-
-        if (code === "KeyK" && (ctrlKey || metaKey)) {
-          event.preventDefault();
-          let url: string | null;
-          if (!isLink) {
-            setIsLinkEditMode(true);
-            url = sanitizeUrl("https://");
-          } else {
-            setIsLinkEditMode(false);
-            url = null;
-          }
-          return activeEditor.dispatchCommand(TOGGLE_LINK_COMMAND, url);
-        }
-        return false;
-      },
-      COMMAND_PRIORITY_NORMAL,
-    );
-  }, [activeEditor, isLink, setIsLinkEditMode]);
 
   const insertLink = useCallback(() => {
     if (!isLink) {
@@ -193,7 +206,8 @@ export default function ToolbarPlugin({
       </Button>
 
       <Separator orientation="vertical" />
-      <CustomHeadingActions />
+
+      <BlockFormatDropdown editor={activeEditor} blockType={blockType} />
 
       <Button
         variant="ghost"
