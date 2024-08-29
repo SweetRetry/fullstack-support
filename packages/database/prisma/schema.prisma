@@ -21,6 +21,7 @@ model Role {
   id          String       @id @default(cuid())
   name        String       @unique
   description String?
+  editable    Boolean      @default(true)
   permissions Permission[] @relation(name: "RolePermissions")
   User        User[]
 }

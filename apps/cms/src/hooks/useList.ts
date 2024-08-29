@@ -15,7 +15,7 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
       list: T[];
       totalPage: number;
       totalCount: number;
-    }>
+    } | null>
   >,
   options?: {
     delay?: number;
@@ -46,10 +46,13 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
         service(params.current),
         delay((options?.delay || 1) * 1000),
       ]);
+
+      console.log(data);
+
       if (code === 200) {
-        setData(data.list || []);
-        setTotalPage(data?.totalPage);
-        setTotalCount(data?.totalCount);
+        setData(data?.list || []);
+        setTotalPage(data?.totalPage || 0);
+        setTotalCount(data?.totalCount || 0);
       } else {
         setError(message);
       }

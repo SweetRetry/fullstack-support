@@ -45,8 +45,9 @@ const page = () => {
       "After deleting, you will not be able to recover this article.",
     content: "Are you sure you want to delete this article?",
     onConfirm: async () => {
-      if (actionArticleItem?.id) {
-        const id = await deleteArticle({ id: actionArticleItem?.id });
+      const token = localStorage.getItem("token");
+      if (actionArticleItem?.id && token) {
+        const id = await deleteArticle({ id: actionArticleItem?.id }, token);
         if (id) {
           close();
           setData((prev) =>
@@ -105,7 +106,7 @@ const page = () => {
                 <span> Filter</span>
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent className="z-10 bg-background shadow">
               <DropdownMenuItem
                 onClick={() => {
                   setStatus(undefined);

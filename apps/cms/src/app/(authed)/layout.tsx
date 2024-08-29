@@ -19,9 +19,9 @@ const menus = [
     href: "/articles",
   },
   {
-    name: "Roles",
+    name: "Users",
     icon: <User />,
-    href: "/roles",
+    href: "/users",
   },
 ];
 const AuthedLayout = ({ children }: { children: React.ReactNode }) => {

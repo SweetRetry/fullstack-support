@@ -8,6 +8,17 @@ export class IResponse {
       message: message || "success",
     };
   }
+  static FakeSuccess<T = any>(
+    data: T,
+    code: number,
+    message?: string
+  ): ResponseData<T> {
+    return {
+      code,
+      data,
+      message: message || "success",
+    };
+  }
 
   static Error(code: number, message: string): ResponseData<null> {
     return {

@@ -10,29 +10,28 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatToUtcTime } from "@/lib/dayjsUtil";
-import { getArticleList } from "@repo/database/services/article";
+import {
+  ArticleListItem,
+  getArticleList,
+} from "@repo/database/services/article";
 import { ColumnDef } from "@tanstack/react-table";
-import { DELETE_WORD_COMMAND } from "lexical";
-import { Delete, Edit, Eye, LucideDelete, MoreHorizontal } from "lucide-react";
+
+import { Delete, Edit, Eye, MoreHorizontal } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 // This type is used to define the shape of our data.
 // You can use a Zod schema here if you want.
 
-export type Column = Awaited<
-  ReturnType<typeof getArticleList>
->["data"]["list"][0];
-
 export const useColumns = ({
   onOpenDeleteModal,
   onOpenPreviewModal,
 }: {
-  onOpenDeleteModal: (item: Column) => void;
-  onOpenPreviewModal: (item: Column) => void;
+  onOpenDeleteModal: (item: ArticleListItem) => void;
+  onOpenPreviewModal: (item: ArticleListItem) => void;
 }) => {
   const router = useRouter();
 
-  const columns: ColumnDef<Column>[] = [
+  const columns: ColumnDef<ArticleListItem>[] = [
     {
       accessorKey: "title",
       header: "Title",
