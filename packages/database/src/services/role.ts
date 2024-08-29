@@ -2,25 +2,11 @@
 import { prisma } from "../client";
 import { IResponse } from "../utils/responseUtil";
 
-export const getRoles = async (params: {
-  pageId: number;
-  pageSize: number;
-}) => {
+export const getRoleList = async () => {
   try {
-    const roles = await prisma.role.findMany({
-      take: params.pageSize,
-      skip: (params.pageId - 1) * params.pageSize,
-    });
+    const roles = await prisma.role.findMany();
 
-    const count = await prisma.role.count();
-
-    return IResponse.Success({
-      list: roles,
-      pageId: params.pageId,
-      pageSize: params.pageSize,
-      totalPage: Math.ceil(count / params.pageSize),
-      totalCount: count,
-    });
+    return IResponse.Success(roles);
   } catch (err) {
     return IResponse.Error(500, "Internal Server Error");
   }
@@ -65,3 +51,29 @@ export const getRolePermissionsById = async (roleId: string) => {
     return IResponse.Error(500, "Internal Server Error");
   }
 };
+
+export async function putRolePermissionsUpdate(params: {
+  roleId: string;
+  permissions: string[];
+}) {
+  try {
+    const role = await prisma.$transaction(async (tx) => {
+      return await tx.role.update({
+        where: {
+          id: params.roleId,
+        },
+        data: {
+          permissions: {
+            set: params.permissions.map((permissionId) => ({
+              id: permissionId,
+            })),
+          },
+        },
+      });
+    });
+
+    return IResponse.Success(role);
+  } catch (err) {
+    return IResponse.Error(500, "Internal Server Error");
+  }
+}

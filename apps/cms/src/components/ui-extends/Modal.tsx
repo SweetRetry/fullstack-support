@@ -66,9 +66,8 @@ export function Modal({
         >
           <DialogHeader className="px-6 pt-6">
             <DialogTitle>{title}</DialogTitle>
-            {description && (
-              <DialogDescription>{description}</DialogDescription>
-            )}
+
+            <DialogDescription>{description}</DialogDescription>
           </DialogHeader>
 
           <div
@@ -94,7 +93,7 @@ export function Modal({
               <X className="h-4 w-4" />
             </DrawerClose>
           </div>
-          {description && <DrawerDescription>{description}</DrawerDescription>}
+          <DrawerDescription>{description}</DrawerDescription>
         </DrawerHeader>
         <div className="max-h-[90vh] overflow-auto p-4">{children}</div>
       </DrawerContent>

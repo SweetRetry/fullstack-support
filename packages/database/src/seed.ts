@@ -30,6 +30,7 @@ async function main() {
     data: {
       name: "superAdmin",
       description: "Super Admin",
+      editable: false,
       permissions: {
         connect: permissions,
       },
@@ -41,7 +42,9 @@ async function main() {
     data: {
       email: "admin@test.com",
       password: "admin123",
-      roleId: role.id,
+      role: {
+        connect: role,
+      },
     },
   });
 }

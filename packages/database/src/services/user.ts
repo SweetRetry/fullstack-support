@@ -51,3 +51,27 @@ export const getUserList = async (params: {
     );
   }
 };
+
+export const postCreateUser = async (params: {
+  email: string;
+  password: string;
+  roleId: string;
+}) => {
+  try {
+    const newUser = await prisma.user.create({
+      data: {
+        email: params.email,
+        password: params.password,
+        role: {
+          connect: {
+            id: params.roleId,
+          },
+        },
+      },
+    });
+
+    return IResponse.Success(newUser);
+  } catch (err) {
+    return IResponse.Error(500, "Internal Server Error");
+  }
+};

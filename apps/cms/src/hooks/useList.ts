@@ -47,8 +47,6 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
         delay((options?.delay || 1) * 1000),
       ]);
 
-      console.log(data);
-
       if (code === 200) {
         setData(data?.list || []);
         setTotalPage(data?.totalPage || 0);

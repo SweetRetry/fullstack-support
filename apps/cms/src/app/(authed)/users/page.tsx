@@ -4,22 +4,17 @@ import React, { useEffect, useState } from "react";
 import { getUserList, UserListItem } from "@repo/database/services/user";
 import { useColumns } from "./_components/columns";
 import { DataTable } from "./_components/data-table";
-import { Modal } from "@/components/ui-extends/Modal";
+
 import { Input } from "@/components/ui/input";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 
 import { Plus } from "lucide-react";
 import RoleEditModal from "./_components/RoleEditModal";
+import CreateUserModal from "./_components/CreateUserModal";
 const page = () => {
   const [emailLike, setEmailLike] = useState("");
 
-  const { fetch, data, totalCount, totalPage, loading } = useList(
+  const { fetch, data, totalCount, totalPage, loading ,setData} = useList(
     {
       emailLike,
     },
@@ -28,6 +23,8 @@ const page = () => {
 
   const [actionItem, setActionitem] = useState<UserListItem>();
   const [open, setOpen] = useState(false);
+
+  const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
 
   const onEdit = (item: UserListItem) => {
     setActionitem(item);
@@ -86,7 +83,7 @@ const page = () => {
             </DropdownMenuContent>
           </DropdownMenu> */}
 
-          <Button>
+          <Button onClick={() => setCreateUserModalOpen(true)}>
             <Plus className="mr-1" width={20} height={20} />
             <span>Add Users</span>
           </Button>
@@ -106,6 +103,11 @@ const page = () => {
           roleId={actionItem?.role?.id}
         />
       )}
+      <CreateUserModal
+        open={createUserModalOpen}
+        setOpen={setCreateUserModalOpen}
+
+      />
     </div>
   );
 };
