@@ -6,7 +6,7 @@ import { useList } from "@/hooks/useList";
 import { deleteArticle, getArticleList } from "@repo/database/services/article";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FilterIcon, PlusCircleIcon } from "lucide-react";
+import { FilterIcon, Plus } from "lucide-react";
 import { DataTable } from "./data-table";
 import { useColumns } from "./columns";
 import { ArticleStatus } from "@prisma/client";
@@ -130,7 +130,7 @@ const page = () => {
           </DropdownMenu>
           <Link href="/articles/editor/draft/new">
             <Button>
-              <PlusCircleIcon className="mr-1" width={20} height={20} />
+              <Plus className="mr-1" width={20} height={20} />
               <span>Add Article</span>
             </Button>
           </Link>

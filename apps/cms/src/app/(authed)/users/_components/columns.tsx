@@ -63,7 +63,7 @@ export const useColumns = ({
                 onClick={() => onEdit(row.original)}
                 disabled={!row.original.role?.editable}
               >
-                <Edit width={16} height={16} className="mr-1" />
+                <Edit width={16} height={16} className="mr-2" />
                 <span>Edit</span>
               </DropdownMenuItem>
             </DropdownMenuContent>

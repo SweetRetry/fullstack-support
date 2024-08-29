@@ -12,6 +12,7 @@ export type UserListItem = {
 export const getUserList = async (params: {
   pageId: number;
   pageSize: number;
+  emailLike?: string;
 }) => {
   try {
     const users = await prisma.user.findMany({
@@ -23,6 +24,11 @@ export const getUserList = async (params: {
         createdAt: true,
         id: true,
         updatedAt: true,
+      },
+      where: {
+        email: {
+          contains: params.emailLike,
+        },
       },
     });
 

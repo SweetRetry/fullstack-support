@@ -1,8 +1,7 @@
 "use client";
 
-import { useModal } from "@/components/ui-extends/Modal";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,10 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { formatToUtcTime } from "@/lib/dayjsUtil";
-import {
-  ArticleListItem,
-  getArticleList,
-} from "@repo/database/services/article";
+import { ArticleListItem } from "@repo/database/services/article";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Delete, Edit, Eye, MoreHorizontal } from "lucide-react";
