@@ -29,7 +29,7 @@ function Editor() {
   const [isLinkEditMode, setIsLinkEditMode] = useState(false);
 
   return (
-    <section className="rounded-0">
+    <section className="rounded-0 max-h-[80%] min-h-[800px]">
       <div className="flex w-full items-center justify-between border-y border-solid border-border">
         <ToolbarPlugin setIsLinkEditMode={setIsLinkEditMode} />
       </div>

@@ -3,6 +3,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
@@ -63,22 +65,23 @@ const AlignPlugin = ({
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        {Object.entries(elementFormatType).map(([key, value]) => (
-          <DropdownMenuItem
-            key={key}
-            onClick={() => {
-              editor.dispatchCommand(
-                FORMAT_ELEMENT_COMMAND,
-                key as ElementFormatType,
-              );
-            }}
-          >
-            <Button variant="ghost" size="sm">
+        <DropdownMenuRadioGroup value={elementFormat}>
+          {Object.entries(elementFormatType).map(([key, value]) => (
+            <DropdownMenuRadioItem
+              key={key}
+              value={key}
+              onClick={() => {
+                editor.dispatchCommand(
+                  FORMAT_ELEMENT_COMMAND,
+                  key as ElementFormatType,
+                );
+              }}
+            >
               {isRTL ? value.iconRTL : value.icon}
               <span className="ml-1">{value.label}</span>
-            </Button>
-          </DropdownMenuItem>
-        ))}
+            </DropdownMenuRadioItem>
+          ))}
+        </DropdownMenuRadioGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -42,7 +42,7 @@ import {
   Undo,
 } from "lucide-react";
 import { BlockFormatDropdown } from "./BlockFormatDropdown";
-import AlignPlugin from "../AlignPlugin";
+import AlignPlugin from "./AlignPlugin";
 import { cn } from "@/lib/utils";
 import { sanitizeUrl } from "@/lib/url";
 import { getSelectedNode } from "@/lib/getSelectedNode";

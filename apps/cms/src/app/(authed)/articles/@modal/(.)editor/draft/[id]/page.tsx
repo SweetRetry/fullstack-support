@@ -19,9 +19,10 @@ export default function WriteApp({ params }: { params: { id: string } }) {
       setOpen={() => router.back()}
       title="Write article"
       limitHeight
-      width={1000}
+      width={900}
+      
     >
-      <EditorApp id={params.id} />
+      <EditorApp id={params.id}/>
     </Modal>
   );
 }
