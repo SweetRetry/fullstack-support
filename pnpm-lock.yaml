@@ -265,6 +265,9 @@ importers:
       '@repo/lexical':
         specifier: workspace:*
         version: link:../../packages/lexical
+      '@repo/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       ahooks:
         specifier: ^3.8.1
         version: 3.8.1(react@18.3.1)

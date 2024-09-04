@@ -13,8 +13,8 @@ import { getArticleListByKeyword } from "@repo/database/services/article";
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { formatToUtcTime } from "@/lib/dayjsUtil";
-import { highlightSearchText } from "@/lib/stringUtil";
+import { formatToUtcTime } from "@repo/utils/dayjsUtil";
+import { highlightSearchText } from "@repo/utils/stringUtil";
 
 const SearchPage = async ({
   searchParams,
