@@ -28,6 +28,7 @@ import {
   postSaveActical,
   putUpdateArticle,
 } from "@repo/database/services/article";
+import { getToken } from "@/lib/tokenUtil";
 
 function EditorForm({ id }: { id: string }) {
   const { form, title, categoryId, editor } = useEditorForm(id);
@@ -71,8 +72,10 @@ function EditorForm({ id }: { id: string }) {
           content: JSON.stringify(content),
           description: _description,
         },
-        localStorage.getItem("token") || "",
+        getToken(),
       );
+
+      console.log(res);
 
       if (res?.data?.id) {
         onSuccess?.(res);
@@ -85,10 +88,10 @@ function EditorForm({ id }: { id: string }) {
           content: JSON.stringify(content),
           description: _description,
         },
-        localStorage.getItem("token") || "",
+        getToken(),
       );
 
-      if (res.code === 200) {
+      if (res.code === 200 && res.data?.id) {
         onSuccess?.(res);
       }
     }
@@ -127,7 +130,7 @@ function EditorForm({ id }: { id: string }) {
         status: ArticleStatus.PUBLISHED,
         updatedAt: new Date(),
       },
-      localStorage.getItem("token") || "",
+      getToken(),
     );
 
     if (res.code === 200) {
@@ -136,7 +139,7 @@ function EditorForm({ id }: { id: string }) {
     }
   };
 
-  // useWindowUnload();
+  useWindowUnload();
 
   return (
     <main className="container rounded bg-background">

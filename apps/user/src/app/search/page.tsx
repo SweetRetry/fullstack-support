@@ -9,8 +9,7 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-
-import { ArticleStatus, prisma } from "@repo/database";
+import { getArticleListByKeyword } from "@repo/database/services/article";
 
 import { cn } from "@/lib/utils";
 import Link from "next/link";
@@ -24,37 +23,7 @@ const SearchPage = async ({
     q: string;
   };
 }) => {
-  const articles = await prisma.article.findMany({
-    where: {
-      OR: [
-        {
-          title: {
-            contains: searchParams.q,
-          },
-        },
-        {
-          description: {
-            contains: searchParams.q,
-          },
-        },
-      ],
-      status: ArticleStatus.PUBLISHED,
-    },
-    take: 10,
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      updatedAt: true,
-      categoryId: true,
-
-      category: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
+  const { data: articles } = await getArticleListByKeyword(searchParams.q);
 
   return (
     <main>
@@ -79,8 +48,8 @@ const SearchPage = async ({
             </BreadcrumbList>
           </Breadcrumb>
           <div className="space-y-4">
-            {articles.length ? (
-              articles.map((article, index) => (
+            {articles?.length ? (
+              articles?.map((article, index) => (
                 <div
                   key={article.id}
                   className={cn("py-4", {

@@ -24,3 +24,50 @@ export async function getCategoryListByPublished() {
     );
   }
 }
+
+export async function getCategoryWithArticles(categoryId: string) {
+  try {
+    const categroy = await prisma.category.findUnique({
+      where: {
+        id: categoryId,
+      },
+      include: {
+        articles: {
+          where: {
+            status: ArticleStatus.PUBLISHED,
+          },
+          select: {
+            id: true,
+            title: true,
+            updatedAt: true,
+            description: true,
+          },
+        },
+      },
+    });
+
+    return IResponse.Success(categroy);
+  } catch (err) {
+    return IResponse.Error(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "Internal Server Error"
+    );
+  }
+}
+
+
+export async function getCategoryList(categoryName?: string) {
+  return await prisma.category.findMany({
+    where: {
+      name: {
+        contains: categoryName,
+      },
+    },
+  });
+}
+export async function postCreateNewCategory(newCategoryName: string) {
+  return await prisma.category.create({
+    data: { name: newCategoryName },
+  });
+}
+

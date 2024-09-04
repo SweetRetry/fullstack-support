@@ -1,77 +1,34 @@
 "use client";
 
-import { Article, prisma } from "@repo/database";
-import { formatToUtcTime } from "@/lib/dayjsUtil";
-import { theme } from "@/lib/lexicalTheme";
+import { Article } from "@repo/database";
 import { useEffect, useState } from "react";
-import { ContentEditable } from "@lexical/react/LexicalContentEditable";
-import { LexicalErrorBoundary } from "@lexical/react/LexicalErrorBoundary";
-
-import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
-import {
-  InitialConfigType,
-  LexicalComposer,
-} from "@lexical/react/LexicalComposer";
 import { getArticle } from "@repo/database/services/article";
-import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 
-const editorConfig: InitialConfigType = {
-  namespace: "Article Viewer",
-  theme: theme,
-  onError: (e: Error) => {
-    console.error(e);
-  },
-  editable: false,
-};
+import { LoadingSpinner } from "./LoadingSpinner";
+import ClientViewer from "@repo/lexical/components/ClientViewer";
 
-const Viewer = ({ content }: { content: string }) => {
-  const [editor] = useLexicalComposerContext();
-
-  useEffect(() => {
-    editor.setEditorState(editor.parseEditorState(content));
-  }, [content]);
-
-  return (
-    <RichTextPlugin
-      contentEditable={
-        <ContentEditable
-          className="editor-input"
-          aria-placeholder="Enter some rich text..."
-          placeholder={
-            <div className="editor-placeholder">Enter some rich text...</div>
-          }
-        />
-      }
-      ErrorBoundary={LexicalErrorBoundary}
-    />
-  );
-};
 const ArticleViewer = ({ id }: { id?: string }) => {
   const [article, setArticle] = useState<Article>();
 
+  const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     async function run() {
+      setLoading(true);
       if (!id) return;
-      const res = await getArticle(id);
+
+      const res = await getArticle(id!);
       if (res.data?.id) {
         setArticle(res.data);
       }
+      setLoading(false);
     }
 
     run();
   }, [id]);
 
-  return (
-    <article className="flex-1 border border-border p-4">
-      <h2 className="text-2xl font-bold">{article?.title}</h2>
-      <p className="mt-2 text-muted-foreground">
-        {article?.updatedAt && formatToUtcTime(article?.updatedAt)}
-      </p>
-      <LexicalComposer initialConfig={editorConfig}>
-        {article?.content && <Viewer content={article.content} />}
-      </LexicalComposer>
-    </article>
-  );
+  if (loading) return <LoadingSpinner size="lg" />;
+  if (article) return <ClientViewer article={article} />;
 };
 
 export default ArticleViewer;

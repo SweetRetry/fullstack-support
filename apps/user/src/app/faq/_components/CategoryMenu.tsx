@@ -1,25 +1,14 @@
-import { ArticleStatus, prisma } from "@repo/database";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { getCategoryListByPublished } from "@repo/database/services/category";
 
 const CategoryMenu = async ({ categoryId }: { categoryId: string }) => {
-  const categroyNames = await prisma.category.findMany({
-    select: {
-      id: true,
-      name: true,
-    },
-    where: {
-      articles: {
-        some: {
-          status: ArticleStatus.PUBLISHED,
-        },
-      },
-    },
-  });
+  const { data: categoryList } = await getCategoryListByPublished();
 
   return (
     <aside className="table:py-6 w-[200px] space-y-2 border-r border-solid border-border py-8 mobile:w-fit mobile:py-4">
-      {categroyNames.map((item) => (
+
+      {categoryList?.map((item) => (
         <Link
           key={item.id}
           href={`/faq/${item.id}`}

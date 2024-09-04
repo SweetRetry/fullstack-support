@@ -14,7 +14,7 @@ import Link from "next/link";
 // import dynamic from "next/dynamic";
 import React from "react";
 import CategoryMenu from "../_components/CategoryMenu";
-import { ArticleStatus, prisma } from "@repo/database";
+import { getCategoryWithArticles } from "@repo/database/services/category";
 
 // const LocalTime = dynamic(() => import("@/components/LocalTime"), {
 //   ssr: false,
@@ -26,24 +26,7 @@ const page = async ({
     categoryId: string;
   };
 }) => {
-  const categroy = await prisma.category.findUnique({
-    where: {
-      id: params.categoryId,
-    },
-    include: {
-      articles: {
-        where: {
-          status: ArticleStatus.PUBLISHED,
-        },
-        select: {
-          id: true,
-          title: true,
-          updatedAt: true,
-          description: true,
-        },
-      },
-    },
-  });
+  const { data: category } = await getCategoryWithArticles(params.categoryId);
 
   return (
     <main className="flex">
@@ -61,12 +44,12 @@ const page = async ({
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{categroy?.name}</BreadcrumbPage>
+                <BreadcrumbPage>{category?.name}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
           <div className="space-y-4">
-            {categroy?.articles.map((article, index) => (
+            {category?.articles.map((article, index) => (
               <div key={article.id}>
                 <div className="mb-4 flex items-center justify-between">
                   <Link
@@ -84,7 +67,7 @@ const page = async ({
                 <p className="whitespace-pre-line text-muted-foreground">
                   {article.description}
                 </p>
-                {index !== categroy.articles.length - 1 && (
+                {index !== category.articles.length - 1 && (
                   <Separator className="my-4" />
                 )}
               </div>

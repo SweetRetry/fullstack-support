@@ -8,14 +8,14 @@ import { createHeadlessEditor as _createHeadlessEditor } from "@lexical/headless
 
 import { JSDOM } from "jsdom";
 import { $generateHtmlFromNodes } from "@lexical/html";
-import { theme } from "../config/lexicalTheme";
+import { lexicalTheme } from "../config/lexicalTheme";
 
 // import { htmlConfig } from "./htmlConfig";
 
 const createHeadlessEditor = ({ namespace }: { namespace?: string }) => {
   return _createHeadlessEditor({
     namespace,
-    theme: theme,
+    theme: lexicalTheme,
     onError: (e: Error) => {
       console.error(e);
     },

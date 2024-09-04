@@ -1,8 +1,15 @@
-import { delay } from "@/lib/delay";
-import { useDebounceFn } from "ahooks";
 import { useCallback, useRef, useState } from "react";
 import { ResponseData } from "@repo/database/types/response";
 import { debounce } from "lodash-es";
+
+export function delay(ms:number) {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, ms);
+  });
+}
+
 export const useList = <T, P extends Record<string, any> = Record<string, any>>(
   queryParams: Omit<P, "pageId" | "pageSize"> & {
     pageId?: number;

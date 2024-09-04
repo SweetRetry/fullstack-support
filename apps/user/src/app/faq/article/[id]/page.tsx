@@ -12,7 +12,7 @@ import {
 
 import RealtedArticles from "./_components/RealtedArticles";
 
-import { Viewer } from "@repo/lexical";
+import Viewer from "@repo/lexical/components/Viewer";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const data = await prisma.article.findUnique({
@@ -34,20 +34,20 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     data,
   };
 }
-const getPost = async (id: string) => {
+const getArticle = async (id: string) => {
   const { data } = await generateMetadata({ params: { id } });
 
   return data;
 };
 
 const page = async ({ params }: { params: { id: string } }) => {
-  const post = await getPost(params.id);
+  const article = await getArticle(params.id);
 
-  if (!post?.id) return;
+  if (!article?.id) return;
 
   return (
     <main className="mt-6 flex">
-      {post.categoryId && <CategoryMenu categoryId={post.categoryId} />}
+      {article.categoryId && <CategoryMenu categoryId={article.categoryId} />}
       <section className="flex flex-1 px-8">
         <main className="flex-grow">
           <Breadcrumb>
@@ -61,22 +61,22 @@ const page = async ({ params }: { params: { id: string } }) => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href={`/support/faq/${post.categoryId}`}>
-                  {post.category?.name}
+                <BreadcrumbLink href={`/support/faq/${article.categoryId}`}>
+                  {article.category?.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{post?.title}</BreadcrumbPage>
+                <BreadcrumbPage>{article?.title}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <Viewer post={post} />
+          <Viewer article={article} />
         </main>
-        {post.categoryId && (
+        {article.categoryId && (
           <RealtedArticles
-            categoryId={post.categoryId}
-            currentArticleId={post.id}
+            categoryId={article.categoryId}
+            currentArticleId={article.id}
           />
         )}
       </section>

@@ -2,7 +2,9 @@
   "name": "@repo/lexical",
   "version": "1.0.0",
   "exports": {
-    ".": "./src/main.ts"
+    "./components/*": "./src/components/*.tsx",
+    "./config/*": "./src/config/*.ts",
+    "./utils/*": "./src/utils/*.ts"
   },
   "dependencies": {
     "@lexical/code": "^0.17.0",

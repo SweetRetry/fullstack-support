@@ -1,12 +1,24 @@
 import { cn } from "@/lib/utils";
 
-export const LoadingSpinner = ({ className }: { className?: string }) => {
+export const LoadingSpinner = ({
+  className,
+  size,
+}: {
+  className?: string;
+  size?: "lg" | "md" | "default";
+}) => {
+  const [width, height] = {
+    lg: [48, 48],
+    md: [36, 36],
+    default: [24, 24],
+  }[size || "default"];
+
   return (
     <div className="flex items-center justify-center">
       <svg
         xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
+        width={width}
+        height={height}
         viewBox="0 0 24 24"
         fill="none"
         stroke="currentColor"

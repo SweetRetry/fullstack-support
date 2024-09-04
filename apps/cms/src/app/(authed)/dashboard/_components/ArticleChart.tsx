@@ -1,22 +1,69 @@
 "use client";
-import { getArticleAnlytics } from "@repo/database/services/article";
+import { getArticleAnlytics } from "@repo/database/services/anlytics";
 import React, { useEffect, useState } from "react";
+import { EChartsOption, init } from "echarts";
 
 type Anlytics = Awaited<ReturnType<typeof getArticleAnlytics>>["data"];
-const ArticleChart = () => {
-  const [anlytics, setAnlytics] = useState<Anlytics>();
 
+const option: EChartsOption = {
+  title: {
+    text: "Article Status",
+    left: "center",
+  },
+  tooltip: {
+    trigger: "item",
+  },
+  legend: {
+    orient: "vertical",
+    left: "left",
+  },
+  series: [
+    {
+      name: "Article Status",
+      type: "pie",
+      radius: "50%",
+      data: [] as Array<{ value: number; name: string }>,
+      label: {
+        show: true,
+      },
+      emphasis: {
+        itemStyle: {
+          shadowBlur: 10,
+          shadowOffsetX: 0,
+          shadowColor: "rgba(0, 0, 0, 0.5)",
+        },
+      },
+    },
+  ],
+};
+const ArticleChart = () => {
   useEffect(() => {
     async function run() {
       const res = await getArticleAnlytics();
-      if (res.code === 200) {
-        res.data && setAnlytics(res.data);
+      if (res.code === 200 && res.data) {
+        console.log(res.data);
+        const chartDom = document.getElementById("article-pie-chart");
+        const myChart = init(chartDom);
+        option.series[0].data = res.data?.map((item) => {
+          return {
+            value: item._count,
+            name: item.status,
+          };
+        });
+        myChart.setOption(option);
       }
     }
 
     run();
   }, []);
-  return <div>12312</div>;
+
+  return (
+    <div
+      id="article-pie-chart"
+      style={{ width: 600, height: 400 }}
+      className="w-full"
+    ></div>
+  );
 };
 
 export default ArticleChart;

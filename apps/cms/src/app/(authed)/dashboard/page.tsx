@@ -1,12 +1,12 @@
 "use client";
 import React from "react";
 import RecentPublished from "./_components/RecentPublished";
-// import ArticleChart from "./_components/ArticleChart";
+import ArticleChart from "./_components/ArticleChart";
 const page = () => {
   return (
-    <main>
+    <main >
+      <ArticleChart />
       <RecentPublished />
-      {/* <ArticleChart /> */}
     </main>
   );
 };

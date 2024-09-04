@@ -5,7 +5,7 @@
  * LICENSE file in the root directory of this source tree.
  *
  */
-export const theme = {
+export const lexicalTheme = {
   code: "editor-code",
   heading: {
     h1: "editor-heading-h1",

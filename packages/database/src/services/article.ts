@@ -1,9 +1,9 @@
 "use server";
-import { Article, ArticleStatus, prisma } from "../client";
+import { prisma, Article, ArticleStatus } from "../client";
 import { PermissionUtil } from "../utils/authUtil";
 import { z } from "zod";
 import { IResponse } from "../utils/responseUtil";
-
+import { StatusCodes } from "http-status-codes";
 export async function getArticle(id: string) {
   try {
     const article = await prisma.article.findUnique({
@@ -13,7 +13,7 @@ export async function getArticle(id: string) {
     });
     return IResponse.Success<Article | null>(article);
   } catch (err) {
-    return IResponse.Error(500, "服务器错误");
+    return IResponse.Error(StatusCodes.INTERNAL_SERVER_ERROR, "服务器错误");
   }
 }
 
@@ -190,5 +190,44 @@ export async function putUpdateArticle(
     return IResponse.Success<Article>(updatedArticle);
   } catch (err) {
     return IResponse.Error(500, "服务器错误");
+  }
+}
+
+export async function getArticleListByKeyword(keyword: string) {
+  try {
+    const articles = await prisma.article.findMany({
+      where: {
+        OR: [
+          {
+            title: {
+              contains: keyword,
+            },
+          },
+          {
+            description: {
+              contains: keyword,
+            },
+          },
+        ],
+        status: ArticleStatus.PUBLISHED,
+      },
+      take: 10,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        updatedAt: true,
+        categoryId: true,
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    return IResponse.Success(articles);
+  } catch (err) {
+    return IResponse.Error(StatusCodes.INTERNAL_SERVER_ERROR, "Internal Server Error");
   }
 }

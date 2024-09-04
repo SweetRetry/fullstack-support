@@ -14,8 +14,11 @@ import { Category } from "@prisma/client";
 import SrInput from "../ui-extends/SrInput";
 import { Button } from "../ui/button";
 import { useToast } from "../ui/use-toast";
-import { create, getCategoryList } from "./actions";
 import { useDebounceFn } from "ahooks";
+import {
+  postCreateNewCategory,
+  getCategoryList,
+} from "@repo/database/services/category";
 
 const CategorySelect = ({
   onSelect,
@@ -33,7 +36,7 @@ const CategorySelect = ({
   const { toast } = useToast();
 
   const onAddCatrgory = async () => {
-    const category = await create(newCategoryName);
+    const category = await postCreateNewCategory(newCategoryName);
     if (category.id) {
       setCategories([...categories, category]);
     } else {

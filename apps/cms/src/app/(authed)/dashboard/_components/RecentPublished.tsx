@@ -4,7 +4,7 @@ import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Modal } from "@/components/ui-extends/Modal";
 
 import { useList } from "@/hooks/useList";
-import { formatToUtcTime } from "@/lib/dayjsUtil";
+import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 import { ArticleStatus } from "@prisma/client";
 import { getArticleList } from "@repo/database/services/article";
 import { ArrowRight } from "lucide-react";

@@ -16,6 +16,7 @@ import { z } from "zod";
 import { login } from "@repo/database/services/auth";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+import { setToken } from "@/lib/tokenUtil";
 
 const formSchema = z.object({
   email: z.string().email().min(1, { message: "Email is required" }),
@@ -35,7 +36,7 @@ const UserAuthForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const res = await login(values);
     if (res.data?.token) {
-      localStorage.setItem("token", JSON.stringify(res.data?.token));
+      setToken(res.data.token);
       router.push("/dashboard");
     } else {
       toast({

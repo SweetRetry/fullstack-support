@@ -3,14 +3,18 @@
 import React, { useEffect, useState } from "react";
 
 import { useList } from "@/hooks/useList";
-import { deleteArticle, getArticleList } from "@repo/database/services/article";
+import {
+  ArticleListItem,
+  deleteArticle,
+  getArticle,
+  getArticleList,
+} from "@repo/database/services/article";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FilterIcon, Plus, PlusIcon } from "lucide-react";
-import { DataTable } from "./data-table";
-import { useColumns } from "./columns";
-import { ArticleStatus } from "@prisma/client";
-import { Modal, useModal } from "@/components/ui-extends/Modal";
+import { FilterIcon, PlusIcon } from "lucide-react";
+
+import { Article, ArticleStatus } from "@prisma/client";
+import { useModal } from "@/components/ui-extends/Modal";
 import { useToast } from "@/components/ui/use-toast";
 import {
   DropdownMenu,
@@ -18,22 +22,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
-import ArticleViewer from "@/components/ArticleViewer";
+
 import Link from "next/link";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
-import { formatToUtcTime } from "@/lib/dayjsUtil";
+import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 import { cn } from "@/lib/utils";
+import ArticleViewer from "@/components/ArticleViewer";
+import { getToken } from "@/lib/tokenUtil";
 
 const page = () => {
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<ArticleStatus | undefined>();
   const [categroId, setCategoryId] = useState<string | undefined>();
 
-  const { fetch, data, setData, totalCount, totalPage, loading } = useList(
+  const { fetch, data, setData, loading } = useList(
     { keyword, status, categroId },
     getArticleList,
   );
 
+  const [currentArticle, setCurrentArticle] = useState<Article>();
   const [actionArticleItem, setActionArticleItem] =
     useState<(typeof data)["0"]>();
 
@@ -46,7 +53,7 @@ const page = () => {
       "After deleting, you will not be able to recover this article.",
     content: "Are you sure you want to delete this article?",
     onConfirm: async () => {
-      const token = localStorage.getItem("token");
+      const token = getToken();
       if (actionArticleItem?.id && token) {
         const id = await deleteArticle({ id: actionArticleItem?.id }, token);
         if (id) {
@@ -71,15 +78,13 @@ const page = () => {
     },
   });
 
-  const columns = useColumns({
-    onOpenDeleteModal: (item) => {
-      setActionArticleItem(item);
-      show();
-    },
-    onOpenPreviewModal: (item) => {
-      setActionArticleItem(item);
-    },
-  });
+  const onChangeArticle = async (article: ArticleListItem) => {
+    setActionArticleItem(article);
+    const res = await getArticle(article.id);
+    if (res.data?.id) {
+      setCurrentArticle(res.data);
+    }
+  };
 
   useEffect(() => {
     setActionArticleItem(data?.at(0));
@@ -90,11 +95,11 @@ const page = () => {
   }, []);
 
   return (
-    <main className="flex space-x-4">
+    <section className="flex h-full space-x-4">
       {contextHandler}
 
-      <section className="w-1/3 min-w-[380px]">
-        <div className="flex justify-between">
+      <section className="w-1/3 min-w-[500px]">
+        <div className="flex justify-between space-x-4">
           <Input
             className="max-w-[250px]"
             value={keyword}
@@ -160,7 +165,7 @@ const page = () => {
                     "bg-muted": actionArticleItem?.id === item.id,
                   },
                 )}
-                onClick={() => setActionArticleItem(item)}
+                onClick={() => onChangeArticle(item)}
               >
                 <div className="flex justify-between">
                   <h4 className="font-bold">{item.title}</h4>
@@ -186,19 +191,12 @@ const page = () => {
             ))
           )}
         </ul>
-        {/* <DataTable
-          columns={columns}
-          data={data}
-          loading={loading}
-          totalCount={totalCount}
-          totalPage={totalPage}
-        /> */}
       </section>
 
-      <section className="flex-1">
+      <section className="flex-1 border-l border-border p-4">
         <ArticleViewer id={actionArticleItem?.id} />
       </section>
-    </main>
+    </section>
   );
 };
 

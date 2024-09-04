@@ -2,11 +2,12 @@
 "use client";
 import SiteFooter from "@/components/footer/SiteFooter";
 import SiteHeader from "@/components/header/SiteHeader";
-import { redirect, usePathname } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React from "react";
 import SiteMenu from "./SiteMenu";
 import { LayoutDashboard, Book, User } from "lucide-react";
 import AuthProvider from "./AuthProvider";
+import { getToken } from "@/lib/tokenUtil";
 
 const menus = [
   {
@@ -26,8 +27,7 @@ const menus = [
   },
 ];
 const AuthedLayout = ({ children }: { children: React.ReactNode }) => {
-  const token = localStorage.getItem("token");
-  if (!token) return redirect("/login");
+  const token = getToken()
   const pathname = usePathname();
   const activePath = pathname.split("/")[1];
 
@@ -43,8 +43,8 @@ const AuthedLayout = ({ children }: { children: React.ReactNode }) => {
             name={menus.find((item) => item.href === `/${activePath}`)?.name}
           />
 
-          <main className="mt-16 flex flex-1 flex-col px-8">
-            <section className="flex-grow">{children}</section>
+          <main className="mt-16 flex flex-1 flex-col px-8 ">
+            <section className="flex-grow py-4">{children}</section>
             <SiteFooter />
           </main>
         </main>
