@@ -2,7 +2,7 @@ import { delay } from "@/lib/delay";
 import { useDebounceFn } from "ahooks";
 import { useCallback, useRef, useState } from "react";
 import { ResponseData } from "@repo/database/types/response";
-
+import { debounce } from "lodash-es";
 export const useList = <T, P extends Record<string, any> = Record<string, any>>(
   queryParams: Omit<P, "pageId" | "pageSize"> & {
     pageId?: number;
@@ -39,27 +39,27 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
 
   const canPreviousPage = pageId > 1;
 
-  const { run } = useDebounceFn(
-    async () => {
-      setLoading(true);
-      const [{ code, data, message }, _] = await Promise.all([
-        service(params.current),
-        delay((options?.delay || 1) * 1000),
-      ]);
+  const _fetch = useCallback(async () => {
+    setLoading(true);
 
-      if (code === 200) {
-        setData(data?.list || []);
-        setTotalPage(data?.totalPage || 0);
-        setTotalCount(data?.totalCount || 0);
-      } else {
-        setError(message);
-      }
-      setLoading(false);
-    },
-    { wait: 200 },
-  );
+    const [{ code, data, message }, _] = await Promise.all([
+      service(params.current),
+      delay((options?.delay || 1) * 1000),
+    ]);
 
-  const fetch = useCallback<() => void>(run, [service, options]);
+    if (code === 200) {
+      setData(data?.list || []);
+      setTotalPage(data?.totalPage || 0);
+      setTotalCount(data?.totalCount || 0);
+    } else {
+      setError(message);
+    }
+    setLoading(false);
+
+    return data || [];
+  }, [service, options]);
+
+  const fetch = debounce(async () => await _fetch(), 200);
 
   const nextPage = () => {
     // 检查可否下一页

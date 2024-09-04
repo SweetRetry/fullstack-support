@@ -1,9 +1,10 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { getExistArticle } from "./actions";
+
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
+import { getArticle } from "@repo/database/services/article";
 
 export const useEditorForm = (articalId: string) => {
   const form = useForm({
@@ -28,7 +29,7 @@ export const useEditorForm = (articalId: string) => {
 
   useEffect(() => {
     async function run() {
-      const existArticle = await getExistArticle(articalId);
+      const { data: existArticle } = await getArticle(articalId);
       if (existArticle?.id) {
         form.setValue("title", existArticle.title);
         form.setValue("description", existArticle.description);

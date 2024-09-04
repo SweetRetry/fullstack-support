@@ -33,5 +33,7 @@ module.exports = {
   overrides: [{ files: ["*.js?(x)", "*.ts?(x)"] }],
   rules: {
     "no-unused-vars": "off",
+    "no-undef": "off",
+
   },
 };

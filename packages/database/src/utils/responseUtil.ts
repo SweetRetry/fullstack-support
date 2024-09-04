@@ -1,9 +1,10 @@
+import { StatusCodes } from "http-status-codes";
 import { ResponseData } from "../types/response";
 
 export class IResponse {
   static Success<T = any>(data: T, message?: string): ResponseData<T> {
     return {
-      code: 200,
+      code: StatusCodes.OK,
       data: data,
       message: message || "success",
     };
@@ -29,6 +30,6 @@ export class IResponse {
   }
 
   static PermissionDenied(): ResponseData<null> {
-    return IResponse.Error(403, "Permission Denied");
+    return IResponse.Error(StatusCodes.FORBIDDEN, "Permission Denied");
   }
 }

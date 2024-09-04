@@ -9,9 +9,10 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { formatToUtcTime } from "@/lib/dayjsUtil";
+
 import RealtedArticles from "./_components/RealtedArticles";
-import { getHtml } from "@/lib/lexicalUtil";
+
+import { Viewer } from "@repo/lexical";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const data = await prisma.article.findUnique({
@@ -44,8 +45,6 @@ const page = async ({ params }: { params: { id: string } }) => {
 
   if (!post?.id) return;
 
-  const html = await getHtml(post.content as string);
-
   return (
     <main className="mt-6 flex">
       {post.categoryId && <CategoryMenu categoryId={post.categoryId} />}
@@ -72,16 +71,7 @@ const page = async ({ params }: { params: { id: string } }) => {
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold">{post?.title}</h2>
-            <p className="mt-2 text-muted-foreground">
-              {post.updatedAt && formatToUtcTime(post.updatedAt)}
-            </p>
-            <article
-              dangerouslySetInnerHTML={{ __html: html }}
-              className="mt-8"
-            />
-          </div>
+          <Viewer post={post} />
         </main>
         {post.categoryId && (
           <RealtedArticles

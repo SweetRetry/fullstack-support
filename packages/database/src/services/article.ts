@@ -1,19 +1,9 @@
 "use server";
 import { Article, ArticleStatus, prisma } from "../client";
 import { PermissionUtil } from "../utils/authUtil";
-
+import { z } from "zod";
 import { IResponse } from "../utils/responseUtil";
 
-export async function getArticleAnlytics() {
-  const statusCounts = await prisma.article.groupBy({
-    by: "status",
-    _count: {
-      status: true,
-    },
-  });
-
-  return IResponse.Success(statusCounts);
-}
 export async function getArticle(id: string) {
   try {
     const article = await prisma.article.findUnique({
@@ -71,14 +61,7 @@ export async function getArticleList(params: {
         status: true,
         updatedAt: true,
         description: true,
-        category: params.categoryId
-          ? {
-              select: {
-                id: true,
-                name: true,
-              },
-            }
-          : undefined,
+        category: true,
       },
     });
 
@@ -136,6 +119,75 @@ export async function deleteArticle(data: { id: string }, token: string) {
     });
 
     return IResponse.Success<string>(deletedArticle.id, "删除成功");
+  } catch (err) {
+    return IResponse.Error(500, "服务器错误");
+  }
+}
+
+export async function postSaveActical(
+  data: {
+    title: string;
+    content: string;
+    description: string;
+  },
+  token: string
+) {
+  try {
+    const hasPermission = await PermissionUtil.checkPermission(
+      token,
+      "article:edit"
+    );
+
+    if (!hasPermission) {
+      return IResponse.PermissionDenied();
+    }
+
+    const schema = z.object({
+      title: z.string().min(1),
+      content: z.string().min(1),
+      description: z.string(),
+    });
+
+    const { success } = schema.safeParse(data);
+
+    if (!success) {
+      return IResponse.Error(500, "params error");
+    }
+
+    const newArticle = await prisma.article.create({
+      data,
+    });
+
+    return IResponse.Success<Article>(newArticle);
+  } catch (err) {
+    return IResponse.Error(500, "服务器错误");
+  }
+}
+
+export async function putUpdateArticle(
+  data: Partial<Article> & {
+    id: string;
+  },
+  token: string
+) {
+  try {
+    const hasPermission = await PermissionUtil.checkPermission(
+      token,
+      "article:edit"
+    );
+
+    if (!hasPermission) {
+      return IResponse.PermissionDenied();
+    }
+
+    const updatedArticle = await prisma.article.update({
+      where: {
+        id: data.id,
+      },
+      data,
+    });
+
+    return IResponse.Success<Article>(updatedArticle);
   } catch (err) {
     return IResponse.Error(500, "服务器错误");
   }

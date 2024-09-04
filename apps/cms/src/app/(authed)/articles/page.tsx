@@ -6,7 +6,7 @@ import { useList } from "@/hooks/useList";
 import { deleteArticle, getArticleList } from "@repo/database/services/article";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FilterIcon, Plus } from "lucide-react";
+import { FilterIcon, Plus, PlusIcon } from "lucide-react";
 import { DataTable } from "./data-table";
 import { useColumns } from "./columns";
 import { ArticleStatus } from "@prisma/client";
@@ -18,8 +18,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
-import ArticleViewer from "./ArticleViewer";
+import ArticleViewer from "@/components/ArticleViewer";
 import Link from "next/link";
+import { LoadingSpinner } from "@/components/LoadingSpinner";
+import { formatToUtcTime } from "@/lib/dayjsUtil";
+import { cn } from "@/lib/utils";
 
 const page = () => {
   const [keyword, setKeyword] = useState("");
@@ -33,8 +36,6 @@ const page = () => {
 
   const [actionArticleItem, setActionArticleItem] =
     useState<(typeof data)["0"]>();
-
-  const [previewModalOpen, setPreviewModalOpen] = useState(false);
 
   const { toast } = useToast();
 
@@ -77,82 +78,127 @@ const page = () => {
     },
     onOpenPreviewModal: (item) => {
       setActionArticleItem(item);
-      setPreviewModalOpen(true);
     },
   });
+
+  useEffect(() => {
+    setActionArticleItem(data?.at(0));
+  }, [data]);
 
   useEffect(() => {
     fetch();
   }, []);
 
   return (
-    <div className="p-4">
+    <main className="flex space-x-4">
       {contextHandler}
-      <div className="mb-4 flex justify-between">
-        <Input
-          className="max-w-[300px]"
-          value={keyword}
-          onChange={(e) => {
-            setKeyword(e.target.value);
-            fetch();
-          }}
-          placeholder="Search article by keywords"
-        />
-        <div className="flex gap-2">
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <FilterIcon width={20} height={20} className="mr-1" />
-                <span> Filter</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="z-10 bg-background shadow">
-              <DropdownMenuItem
-                onClick={() => {
-                  setStatus(undefined);
-                  fetch();
-                }}
-              >
-                All
-              </DropdownMenuItem>
-              {Object.values(ArticleStatus).map((item) => (
+
+      <section className="w-1/3 min-w-[380px]">
+        <div className="flex justify-between">
+          <Input
+            className="max-w-[250px]"
+            value={keyword}
+            onChange={(e) => {
+              setKeyword(e.target.value);
+              fetch();
+            }}
+            placeholder="Search article by keywords"
+          />
+          <div className="flex gap-2">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline">
+                  <FilterIcon width={20} height={20} className="mr-1" />
+                  <span> Filter</span>
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="z-10 bg-background shadow">
                 <DropdownMenuItem
-                  key={item}
                   onClick={() => {
-                    setStatus(item);
+                    setStatus(undefined);
                     fetch();
                   }}
                 >
-                  {item}
+                  All
                 </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <Link href="/articles/editor/draft/new">
-            <Button>
-              <Plus className="mr-1" width={20} height={20} />
-              <span>Add Article</span>
-            </Button>
-          </Link>
+                {Object.values(ArticleStatus).map((item) => (
+                  <DropdownMenuItem
+                    key={item}
+                    onClick={() => {
+                      setStatus(item);
+                      fetch();
+                    }}
+                  >
+                    {item}
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+            <Link href="/articles/editor/draft/new">
+              <Button>
+                <PlusIcon width={20} height={20} className="mr-1" />
+                <span>Create</span>
+              </Button>
+            </Link>
+          </div>
         </div>
-      </div>
-      <DataTable
-        columns={columns}
-        data={data}
-        loading={loading}
-        totalCount={totalCount}
-        totalPage={totalPage}
-      />
+        <ul
+          className="space-y-3 overflow-auto py-4"
+          style={{
+            maxHeight: "calc(100vh - 200px)",
+          }}
+        >
+          {loading ? (
+            <LoadingSpinner />
+          ) : (
+            data.map((item) => (
+              <li
+                key={item.id}
+                className={cn(
+                  "cursor-pointer rounded border border-solid border-border p-4 hover:bg-muted active:bg-muted",
+                  {
+                    "bg-muted": actionArticleItem?.id === item.id,
+                  },
+                )}
+                onClick={() => setActionArticleItem(item)}
+              >
+                <div className="flex justify-between">
+                  <h4 className="font-bold">{item.title}</h4>
+                  <p>{formatToUtcTime(item.updatedAt)}</p>
+                </div>
 
-      <Modal
-        open={previewModalOpen}
-        setOpen={setPreviewModalOpen}
-        title="Preview"
-        width={800}
-      >
+                <p className="my-4 text-muted-foreground">{item.description}</p>
+                <div className="flex items-center justify-between text-sm">
+                  <span
+                    className={cn(
+                      "mt-2 rounded border border-border bg-foreground px-2 py-1 text-background",
+                      {
+                        invisible: !item.category?.id,
+                      },
+                    )}
+                  >
+                    {item.category?.name}
+                  </span>
+
+                  <span>{item.status}</span>
+                </div>
+              </li>
+            ))
+          )}
+        </ul>
+        {/* <DataTable
+          columns={columns}
+          data={data}
+          loading={loading}
+          totalCount={totalCount}
+          totalPage={totalPage}
+        /> */}
+      </section>
+
+      <section className="flex-1">
         <ArticleViewer id={actionArticleItem?.id} />
-      </Modal>
-    </div>
+      </section>
+    </main>
   );
 };
 

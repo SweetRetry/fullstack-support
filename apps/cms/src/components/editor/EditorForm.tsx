@@ -24,7 +24,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { useWindowUnload } from "@/hooks/useWindowUnload";
 import Editor from "./_components/Editor";
 import { useEditorForm } from "./useEditorForm";
-import { postSaveActical, putUpdateArticle } from "./actions";
+import {
+  postSaveActical,
+  putUpdateArticle,
+} from "@repo/database/services/article";
 
 function EditorForm({ id }: { id: string }) {
   const { form, title, categoryId, editor } = useEditorForm(id);
@@ -62,22 +65,28 @@ function EditorForm({ id }: { id: string }) {
     if (!title && !_description) return;
 
     if (!articleId) {
-      const res = await postSaveActical({
-        title: title,
-        content: JSON.stringify(content),
-        description: _description,
-      });
+      const res = await postSaveActical(
+        {
+          title: title,
+          content: JSON.stringify(content),
+          description: _description,
+        },
+        localStorage.getItem("token") || "",
+      );
 
-      if (res.data?.id) {
+      if (res?.data?.id) {
         onSuccess?.(res);
       }
     } else {
-      const res = await putUpdateArticle({
-        id: articleId,
-        title,
-        content: JSON.stringify(content),
-        description: _description,
-      });
+      const res = await putUpdateArticle(
+        {
+          id: articleId,
+          title,
+          content: JSON.stringify(content),
+          description: _description,
+        },
+        localStorage.getItem("token") || "",
+      );
 
       if (res.code === 200) {
         onSuccess?.(res);
@@ -109,14 +118,17 @@ function EditorForm({ id }: { id: string }) {
   const onPublish = async () => {
     if (!categoryId) return;
 
-    const res = await putUpdateArticle({
-      id: articleId,
-      categoryId,
-      title,
-      description: form.getValues("description"),
-      status: ArticleStatus.PUBLISHED,
-      updatedAt: new Date(),
-    });
+    const res = await putUpdateArticle(
+      {
+        id: articleId,
+        categoryId,
+        title,
+        description: form.getValues("description"),
+        status: ArticleStatus.PUBLISHED,
+        updatedAt: new Date(),
+      },
+      localStorage.getItem("token") || "",
+    );
 
     if (res.code === 200) {
       setOpen(false);

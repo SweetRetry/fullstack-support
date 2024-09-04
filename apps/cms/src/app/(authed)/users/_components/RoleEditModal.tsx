@@ -90,7 +90,7 @@ const RoleEditModal = ({
               <div className="-mx-2 flex flex-wrap items-center gap-y-2">
                 {permissions.map((permission) => (
                   <div
-                    className="box-border flex w-1/3 items-center space-x-2 px-2"
+                    className="flex basis-1/2 items-center space-x-2 px-2"
                     key={permission.id}
                   >
                     <Checkbox
