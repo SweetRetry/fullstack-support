@@ -7,6 +7,7 @@ const Viewer = async ({
 }: {
   article: {
     content: string;
+    description: string;
     title: string;
     updatedAt: Date;
   };
@@ -14,13 +15,23 @@ const Viewer = async ({
   const html = await getHtml(article.content as string);
 
   return (
-    <div className="mt-8">
-      <h2 className="text-2xl font-bold">{article?.title}</h2>
-      <p className="mt-2 text-muted-foreground">
-        {article.updatedAt && formatToUtcTime(article.updatedAt)}
-      </p>
-      <article dangerouslySetInnerHTML={{ __html: html }} className="mt-8" />
-    </div>
+    <article className="mt-8">
+      <div className="py-2 border-b border-border">
+        <div className="flex justify-between">
+          <h3 className="text-xl font-bold">{article?.title}</h3>
+          <p className="text-muted-foreground">
+            {article?.updatedAt && formatToUtcTime(article?.updatedAt)}
+          </p>
+        </div>
+
+        <p className="mt-2 text-muted-foreground">
+          <span>Description: </span>
+          {article.description}
+        </p>
+      </div>
+
+      <section dangerouslySetInnerHTML={{ __html: html }} className="mt-8" />
+    </article>
   );
 };
 

@@ -110,7 +110,7 @@ const RoleEditModal = ({
                         });
                       }}
                     />
-                    <label>{permission.name}</label>
+                    <label>{permission.description}</label>
                   </div>
                 ))}
               </div>

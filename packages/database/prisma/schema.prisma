@@ -45,6 +45,9 @@ model Category {
 
 enum ArticleStatus {
   DRAFT
+  UNDER_REVIEW
+  UNPUBLISHED
+  PENDING
   PUBLISHED
   DELETED
 }

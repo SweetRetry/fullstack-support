@@ -11,7 +11,7 @@ import {
 } from "@repo/database/services/article";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { FilterIcon, PlusIcon } from "lucide-react";
+import { FilterIcon } from "lucide-react";
 
 import { Article, ArticleStatus } from "@prisma/client";
 import { useModal } from "@/components/ui-extends/Modal";
@@ -29,6 +29,8 @@ import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 import { cn } from "@/lib/utils";
 import ArticleViewer from "@/components/ArticleViewer";
 import { getToken } from "@/lib/tokenUtil";
+import { checkAuth, useAuth } from "../_components/AuthProvider";
+import ViewerToolBar from "./_components/ViewerToolBar";
 
 const page = () => {
   const [keyword, setKeyword] = useState("");
@@ -43,6 +45,8 @@ const page = () => {
   const [currentArticle, setCurrentArticle] = useState<Article>();
   const [actionArticleItem, setActionArticleItem] =
     useState<(typeof data)["0"]>();
+
+  const auth = useAuth();
 
   const { toast } = useToast();
 
@@ -95,11 +99,11 @@ const page = () => {
   }, []);
 
   return (
-    <section className="flex h-full space-x-4">
+    <section className="flex h-full space-x-4 border-t border-border">
       {contextHandler}
 
       <section className="w-1/3 min-w-[500px]">
-        <div className="flex justify-between space-x-4">
+        <div className="flex h-12 items-center justify-between space-x-4">
           <Input
             className="max-w-[250px]"
             value={keyword}
@@ -109,52 +113,46 @@ const page = () => {
             }}
             placeholder="Search article by keywords"
           />
-          <div className="flex gap-2">
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="outline">
-                  <FilterIcon width={20} height={20} className="mr-1" />
-                  <span> Filter</span>
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="z-10 bg-background shadow">
+
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline">
+                <FilterIcon width={20} height={20} className="mr-1" />
+                <span> Filter</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent className="z-10 bg-background shadow">
+              <DropdownMenuItem
+                onClick={() => {
+                  setStatus(undefined);
+                  fetch();
+                }}
+              >
+                All
+              </DropdownMenuItem>
+              {Object.values(ArticleStatus).map((item) => (
                 <DropdownMenuItem
+                  key={item}
                   onClick={() => {
-                    setStatus(undefined);
+                    setStatus(item);
                     fetch();
                   }}
                 >
-                  All
+                  {item}
                 </DropdownMenuItem>
-                {Object.values(ArticleStatus).map((item) => (
-                  <DropdownMenuItem
-                    key={item}
-                    onClick={() => {
-                      setStatus(item);
-                      fetch();
-                    }}
-                  >
-                    {item}
-                  </DropdownMenuItem>
-                ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
-            <Link href="/articles/editor/draft/new">
-              <Button>
-                <PlusIcon width={20} height={20} className="mr-1" />
-                <span>Create</span>
-              </Button>
-            </Link>
-          </div>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
+
         <ul
-          className="space-y-3 overflow-auto py-4"
+          className="mt-2 space-y-3 overflow-auto"
           style={{
             maxHeight: "calc(100vh - 200px)",
           }}
         >
           {loading ? (
-            <LoadingSpinner />
+            <LoadingSpinner className="" />
           ) : (
             data.map((item) => (
               <li
@@ -193,8 +191,18 @@ const page = () => {
         </ul>
       </section>
 
-      <section className="flex-1 border-l border-border p-4">
-        <ArticleViewer id={actionArticleItem?.id} />
+      <section className="flex-1 border-l border-border px-4">
+        {actionArticleItem && (
+          <>
+            <ViewerToolBar
+              id={actionArticleItem?.id}
+              status={actionArticleItem?.status}
+            />
+          </>
+        )}
+        <div className="py-2">
+          <ArticleViewer id={actionArticleItem?.id} />
+        </div>
       </section>
     </section>
   );

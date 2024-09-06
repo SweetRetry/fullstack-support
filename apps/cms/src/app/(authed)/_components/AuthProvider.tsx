@@ -1,5 +1,6 @@
 import { Permission } from "@prisma/client";
 import { getPermissionList } from "@repo/database/services/auth";
+import { redirect, useRouter } from "next/navigation";
 import React, { createContext, useEffect, useState } from "react";
 
 const AuthContext = createContext<Permission[]>([]);
@@ -11,11 +12,13 @@ const AuthProvider = ({
   token: string;
 }) => {
   const [authList, setAuthList] = useState<Permission[]>([]);
-
+  const router = useRouter();
   useEffect(() => {
     async function run() {
       const res = await getPermissionList(token);
+      if (res.code === 403) router.replace("/login");
       res.data && setAuthList(res.data);
+      console.log(res.data);
     }
     run();
   }, []);
@@ -27,4 +30,8 @@ const AuthProvider = ({
 
 export const useAuth = () => React.useContext(AuthContext);
 
+export const checkAuth = (permission: string) => {
+  const authList = useAuth();
+  return authList.findIndex((item) => item.name === permission) !== -1;
+};
 export default AuthProvider;

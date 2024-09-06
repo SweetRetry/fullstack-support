@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { formatToUtcTime } from "@/lib/dayjsUtil";
+import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 
 import { UserListItem } from "@repo/database/services/user";
 import { ColumnDef } from "@tanstack/react-table";

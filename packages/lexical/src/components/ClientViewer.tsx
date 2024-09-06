@@ -48,13 +48,25 @@ const Viewer = ({ content }: { content: string }) => {
 const ClientViewer = ({ article }: { article: Article }) => {
   return (
     <article>
-      <h2 className="text-2xl font-bold">{article?.title}</h2>
-      <p className="mt-2 text-muted-foreground">
-        {article?.updatedAt && formatToUtcTime(article?.updatedAt)}
-      </p>
-      <LexicalComposer initialConfig={editorConfig}>
-        {article?.content && <Viewer content={article.content} />}
-      </LexicalComposer>
+      <div className="py-2 ">
+        <div className="flex justify-between">
+          <h3 className="text-xl font-bold">{article?.title}</h3>
+          <p className="text-muted-foreground">
+            {article?.updatedAt && formatToUtcTime(article?.updatedAt)}
+          </p>
+        </div>
+
+        <p className="mt-2 text-muted-foreground">
+          <span>Description: </span>
+          {article.description}
+        </p>
+      </div>
+
+      <div className="py-2">
+        <LexicalComposer initialConfig={editorConfig}>
+          {article?.content && <Viewer content={article.content} />}
+        </LexicalComposer>
+      </div>
     </article>
   );
 };

@@ -1,4 +1,5 @@
 "use server";
+import { StatusCodes } from "http-status-codes";
 import { Permission, prisma } from "../client";
 import { PermissionUtil } from "../utils/authUtil";
 
@@ -26,10 +27,22 @@ export async function login(data: { email: string; password: string }) {
 
 export async function getPermissionList(token: string) {
   try {
-    return IResponse.Success<Permission[] | undefined>(
-      await PermissionUtil.getUserPermisson(token)
-    );
+    const roleId = TokenUtil.verifyToken(token)?.roleId;
+    if (!roleId) return IResponse.PermissionDenied();
+    const role = await prisma.role.findUnique({
+      where: {
+        id: roleId,
+      },
+      select: {
+        permissions: true,
+      },
+    });
+
+    return IResponse.Success<Permission[] | undefined>(role?.permissions);
   } catch (e) {
-    return IResponse.PermissionDenied();
+    return IResponse.Error(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "Internal Server Error"
+    );
   }
 }
