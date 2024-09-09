@@ -15,6 +15,7 @@ import LexicalAutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import FloatingLinkEditorPlugin from "./plugins/FloatingLinkEditorPlugin";
 // import TreeViewPlugin from "./plugins/TreeViewPlugin";
 import LinkPlugin from "./plugins/LinkPlugin";
+import ImagesPlugin from "./plugins/ImagesPlugin";
 
 function Editor() {
   const [floatingAnchorElem, setFloatingAnchorElem] =
@@ -55,6 +56,7 @@ function Editor() {
         <LexicalAutoLinkPlugin />
         <ListPlugin />
         <CheckListPlugin />
+        <ImagesPlugin />
 
         <LinkPlugin />
         {/* 必須安裝LinkPlugin才可使用 */}

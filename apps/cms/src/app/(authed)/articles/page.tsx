@@ -1,21 +1,14 @@
 "use client";
-// import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import React, { useEffect, useState } from "react";
 
 import { useList } from "@/hooks/useList";
-import {
-  ArticleListItem,
-  deleteArticle,
-  getArticle,
-  getArticleList,
-} from "@repo/database/services/article";
+import { getArticleList } from "@repo/database/services/article";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FilterIcon } from "lucide-react";
 
-import { Article, ArticleStatus } from "@prisma/client";
-import { useModal } from "@/components/ui-extends/Modal";
-import { useToast } from "@/components/ui/use-toast";
+import { ArticleStatus } from "@prisma/client";
+
 import {
   DropdownMenu,
   DropdownMenuItem,
@@ -23,13 +16,11 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
 
-import Link from "next/link";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 import { cn } from "@/lib/utils";
 import ArticleViewer from "@/components/ArticleViewer";
-import { getToken } from "@/lib/tokenUtil";
-import { checkAuth, useAuth } from "../_components/AuthProvider";
+
 import ViewerToolBar from "./_components/ViewerToolBar";
 
 const page = () => {
@@ -42,53 +33,8 @@ const page = () => {
     getArticleList,
   );
 
-  const [currentArticle, setCurrentArticle] = useState<Article>();
   const [actionArticleItem, setActionArticleItem] =
     useState<(typeof data)["0"]>();
-
-  const auth = useAuth();
-
-  const { toast } = useToast();
-
-  const { show, contextHandler, close } = useModal({
-    danger: true,
-    title: "Confirm Delete",
-    description:
-      "After deleting, you will not be able to recover this article.",
-    content: "Are you sure you want to delete this article?",
-    onConfirm: async () => {
-      const token = getToken();
-      if (actionArticleItem?.id && token) {
-        const id = await deleteArticle({ id: actionArticleItem?.id }, token);
-        if (id) {
-          close();
-          setData((prev) =>
-            prev.map((item) => ({
-              ...item,
-              status:
-                item.id === actionArticleItem.id
-                  ? ArticleStatus.DELETED
-                  : item.status,
-            })),
-          );
-        } else {
-          toast({
-            title: "Delete Failed",
-            description: "Please try again later.",
-            variant: "destructive",
-          });
-        }
-      }
-    },
-  });
-
-  const onChangeArticle = async (article: ArticleListItem) => {
-    setActionArticleItem(article);
-    const res = await getArticle(article.id);
-    if (res.data?.id) {
-      setCurrentArticle(res.data);
-    }
-  };
 
   useEffect(() => {
     setActionArticleItem(data?.at(0));
@@ -100,8 +46,6 @@ const page = () => {
 
   return (
     <section className="flex h-full space-x-4 border-t border-border">
-      {contextHandler}
-
       <section className="w-1/3 min-w-[500px]">
         <div className="flex h-12 items-center justify-between space-x-4">
           <Input
@@ -114,6 +58,8 @@ const page = () => {
             placeholder="Search article by keywords"
           />
 
+          {/* TODO:目录筛选 */}
+          
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
@@ -163,7 +109,7 @@ const page = () => {
                     "bg-muted": actionArticleItem?.id === item.id,
                   },
                 )}
-                onClick={() => onChangeArticle(item)}
+                onClick={() => setActionArticleItem(item)}
               >
                 <div className="flex justify-between">
                   <h4 className="font-bold">{item.title}</h4>
@@ -197,6 +143,7 @@ const page = () => {
             <ViewerToolBar
               id={actionArticleItem?.id}
               status={actionArticleItem?.status}
+              setData={setData}
             />
           </>
         )}

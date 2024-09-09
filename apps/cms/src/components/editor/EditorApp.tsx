@@ -12,6 +12,7 @@ import { CodeHighlightNode, CodeNode } from "@lexical/code";
 
 import EditorForm from "./EditorForm";
 import "./theme.css";
+import { ImageNode } from "./nodes/ImageNode";
 
 const editorConfig: InitialConfigType = {
   namespace: "Article Editor",
@@ -31,6 +32,7 @@ const editorConfig: InitialConfigType = {
     QuoteNode,
     CodeNode,
     CodeHighlightNode,
+    ImageNode
   ],
 };
 

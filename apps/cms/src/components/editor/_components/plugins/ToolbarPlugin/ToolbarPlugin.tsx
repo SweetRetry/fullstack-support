@@ -34,6 +34,7 @@ import { Separator } from "@/components/ui/separator";
 
 import {
   Bold,
+  ImageIcon,
   Italic,
   Link,
   Redo,
@@ -49,6 +50,8 @@ import { getSelectedNode } from "@/lib/getSelectedNode";
 import { $isHeadingNode } from "@lexical/rich-text";
 import { BlockType, blockTypeToBlockNameMap } from ".";
 import { $isParentElementRTL } from "@lexical/selection";
+import { InsertImageDialog } from "../ImagesPlugin";
+import { Modal } from "@/components/ui-extends/Modal";
 
 export default function ToolbarPlugin({
   setIsLinkEditMode,
@@ -212,6 +215,8 @@ export default function ToolbarPlugin({
     }
   }, [activeEditor, isLink, setIsLinkEditMode]);
 
+  const [insertImageModalOpen, setInsertImageModalOpen] = useState(false);
+
   return (
     <div className="flex h-12 items-center gap-2 p-2" ref={toolbarRef}>
       <Button
@@ -298,8 +303,27 @@ export default function ToolbarPlugin({
       <Separator orientation="vertical" className="h-full" />
 
       <AlignPlugin elementFormat={elementFormat} isRTL={isRTL} />
-      
+
       <Separator orientation="vertical" className="h-full" />
+
+      <Button
+        variant="ghost"
+        size="icon"
+        onClick={() => setInsertImageModalOpen(true)}
+      >
+        <ImageIcon />
+      </Button>
+
+      <Modal
+        title="Insert Image"
+        open={insertImageModalOpen}
+        setOpen={setInsertImageModalOpen}
+      >
+        <InsertImageDialog
+          activeEditor={activeEditor}
+          onClose={() => setInsertImageModalOpen(false)}
+        />
+      </Modal>
     </div>
   );
 }
