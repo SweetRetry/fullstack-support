@@ -1,10 +1,9 @@
-import cron from "node-cron";
-
-import RedisClient from "../client";
-import { prisma } from "@repo/database";
+import RedisClient from "@repo/redis";
 import { ArticleStatus } from "@prisma/client";
 import { formatToUtcTime } from "@repo/utils/dayjsUtil";
+import { prisma } from "../client";
 import dayjs from "dayjs";
+import cron from "node-cron";
 
 cron.schedule("* * * * *", async () => {
   const now = formatToUtcTime(new Date());
