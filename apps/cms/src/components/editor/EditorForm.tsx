@@ -75,8 +75,6 @@ function EditorForm({ id }: { id: string }) {
         getToken(),
       );
 
-      console.log(res);
-
       if (res?.data?.id) {
         onSuccess?.(res);
       }

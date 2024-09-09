@@ -1,0 +1,23 @@
+{
+  "name": "@repo/redis",
+  "version": "1.0.0",
+  "exports": {
+    ".": "./src/client.ts",
+    "./scheduler/*": "./src/scheduler/*.ts"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/node": "^20",
+    "eslint": "^9.9.0",
+    "typescript": "^5.3.3"
+  },
+  "dependencies": {
+    "@repo/database": "workspace:*",
+    "@repo/utils": "workspace:*",
+    "@types/node-cron": "^3.0.11",
+    "dayjs": "^1.11.13",
+    "ioredis": "^5.4.1",
+    "node-cron": "^3.0.3"
+  }
+}

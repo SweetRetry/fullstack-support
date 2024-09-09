@@ -18,7 +18,6 @@ const AuthProvider = ({
       const res = await getPermissionList(token);
       if (res.code === 403) router.replace("/login");
       res.data && setAuthList(res.data);
-      console.log(res.data);
     }
     run();
   }, []);

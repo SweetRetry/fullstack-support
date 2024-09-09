@@ -1,3 +1,5 @@
 export async function register() {
-  await import("./lib/scheduler/publish");
+  if (process.env.NEXT_RUNTIME === "nodejs") {
+    await import("@repo/redis/scheduler/publish");
+  }
 }

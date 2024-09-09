@@ -1,9 +1,7 @@
 "use client";
 import { getArticleAnlytics } from "@repo/database/services/anlytics";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { EChartsOption, init } from "echarts";
-
-type Anlytics = Awaited<ReturnType<typeof getArticleAnlytics>>["data"];
 
 const option: EChartsOption = {
   title: {
@@ -41,10 +39,9 @@ const ArticleChart = () => {
     async function run() {
       const res = await getArticleAnlytics();
       if (res.code === 200 && res.data) {
-        console.log(res.data);
         const chartDom = document.getElementById("article-pie-chart");
         const myChart = init(chartDom);
-        option.series[0].data = res.data?.map((item) => {
+        (option.series as { data: any }[])[0].data = res.data?.map((item) => {
           return {
             value: item._count,
             name: item.status,
