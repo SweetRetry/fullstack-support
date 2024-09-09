@@ -4,6 +4,7 @@ import { PermissionUtil } from "../utils/authUtil";
 import { z } from "zod";
 import { IResponse } from "../utils/responseUtil";
 import { StatusCodes } from "http-status-codes";
+import Redis from "@repo/redis";
 export async function getArticle(id: string) {
   try {
     const article = await prisma.article.findUnique({
@@ -228,6 +229,61 @@ export async function getArticleListByKeyword(keyword: string) {
 
     return IResponse.Success(articles);
   } catch (err) {
-    return IResponse.Error(StatusCodes.INTERNAL_SERVER_ERROR, "Internal Server Error");
+    return IResponse.Error(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "Internal Server Error"
+    );
+  }
+}
+
+export async function postPulishArticle(
+  data: { id: string; type: "now" | "future"; expiredAt?: string },
+  token: string
+) {
+  const hasPermission = await PermissionUtil.checkPermission(
+    token,
+    "article:publish"
+  );
+
+  if (!hasPermission) {
+    return IResponse.PermissionDenied();
+  }
+
+  try {
+    if (data.type === "future" && data.expiredAt) {
+      const pendingArticle = await prisma.article.update({
+        where: {
+          id: data.id,
+        },
+        data: {
+          status: ArticleStatus.PENDING,
+        },
+      });
+      Redis.set(`pending:artcile:${data.id}`, data.expiredAt);
+      return IResponse.Success(pendingArticle);
+    }
+  } catch (err) {
+    return IResponse.Error(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "Interval server error"
+    );
+  }
+
+  try {
+    const published = await prisma.article.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        status: ArticleStatus.PUBLISHED,
+      },
+    });
+
+    return IResponse.Success(published);
+  } catch (err) {
+    return IResponse.Error(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "Interval server error"
+    );
   }
 }

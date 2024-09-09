@@ -1,10 +1,7 @@
 "use server";
 import { StatusCodes } from "http-status-codes";
 import { Permission, prisma } from "../client";
-import { PermissionUtil } from "../utils/authUtil";
-
 import { IResponse } from "../utils/responseUtil";
-
 import { TokenUtil } from "../utils/tokenUtil";
 
 export async function login(data: { email: string; password: string }) {
