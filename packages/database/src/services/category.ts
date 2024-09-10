@@ -55,19 +55,26 @@ export async function getCategoryWithArticles(categoryId: string) {
   }
 }
 
-
 export async function getCategoryList(categoryName?: string) {
-  return await prisma.category.findMany({
-    where: {
-      name: {
-        contains: categoryName,
+  try {
+    const list = await prisma.category.findMany({
+      where: {
+        name: {
+          contains: categoryName,
+        },
       },
-    },
-  });
+    });
+
+    return IResponse.Success(list);
+  } catch (err) {
+    return IResponse.Error(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "Internal Server Error"
+    );
+  }
 }
 export async function postCreateNewCategory(newCategoryName: string) {
   return await prisma.category.create({
     data: { name: newCategoryName },
   });
 }
-

@@ -49,7 +49,7 @@ export async function getArticleList(params: {
             },
           ]
         : undefined,
-      status: params.status,
+      status: params.status ?? { not: ArticleStatus.DELETED },
       categoryId: params.categoryId,
     };
     const listFn = prisma.article.findMany({
