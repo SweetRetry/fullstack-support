@@ -5,7 +5,7 @@ import { Article, ArticleStatus } from "@prisma/client";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/components/ui/use-toast";
+
 import { Modal } from "@/components/ui-extends/Modal";
 import CategorySelect from "@/components/category/CategorySelect";
 
@@ -29,6 +29,7 @@ import {
   putUpdateArticle,
 } from "@repo/database/services/article";
 import { getToken } from "@/lib/tokenUtil";
+import { useToast } from "@/hooks/use-toast";
 
 function EditorForm({ id }: { id: string }) {
   const { form, title, categoryId, editor } = useEditorForm(id);

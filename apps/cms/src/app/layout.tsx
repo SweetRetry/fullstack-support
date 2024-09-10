@@ -17,8 +17,8 @@ const layout = ({
           disableTransitionOnChange
         >
           <main className="h-screen">{children}</main>
-          <Toaster />
         </ThemeProvider>
+        <Toaster />
       </body>
     </html>
   );

@@ -112,53 +112,62 @@ interface UseModalConfig {
 }
 
 // 封装useModalHook
-export function useModal({
-  title,
-  description,
-  content,
-  onConfirm,
-  onCancel,
-  danger,
-}: UseModalConfig) {
+export function useModal() {
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  const show = () => {
+  const [state, setState] = useState<UseModalConfig>({
+    title: "",
+    content: "",
+    description: "",
+    onConfirm: () => {},
+    onCancel: () => {},
+  });
+
+  const show = ({
+    title,
+    content,
+    description,
+    onConfirm,
+    onCancel,
+  }: UseModalConfig) => {
+    setState({
+      title,
+      content,
+      description,
+      onConfirm,
+      onCancel,
+    });
     setOpen(true);
   };
 
   const close = () => {
     setOpen(false);
+    state?.onCancel && state.onCancel();
   };
+
   return {
     show,
     close,
     contextHandler: (
       <Modal
-        title={title}
+        title={state?.title}
         open={open}
         setOpen={setOpen}
-        description={description}
+        description={state?.description}
       >
-        <div>{content}</div>
+        <div>{state?.content}</div>
         <div className="mt-4 flex justify-end gap-2">
-          <Button
-            variant="secondary"
-            onClick={() => {
-              setOpen(false);
-              onCancel && onCancel();
-            }}
-          >
+          <Button variant="secondary" onClick={() => close()}>
             Cancel
           </Button>
           <ButtonLoading
-            variant={danger ? "destructive" : "default"}
+            variant={state.danger ? "destructive" : "default"}
             loading={loading}
             onClick={async () => {
               setLoading(true);
-              await onConfirm();
+              await state.onConfirm();
               setLoading(false);
-              setOpen(false);
             }}
           >
             Confirm

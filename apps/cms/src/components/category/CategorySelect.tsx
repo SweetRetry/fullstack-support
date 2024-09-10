@@ -13,12 +13,13 @@ import { Check, Plus } from "lucide-react";
 import { Category } from "@prisma/client";
 import SrInput from "../ui-extends/SrInput";
 import { Button } from "../ui/button";
-import { useToast } from "../ui/use-toast";
+
 import { useDebounceFn } from "ahooks";
 import {
   postCreateNewCategory,
   getCategoryList,
 } from "@repo/database/services/category";
+import { useToast } from "@/hooks/use-toast";
 
 const CategorySelect = ({
   onSelect,
@@ -52,7 +53,10 @@ const CategorySelect = ({
   const { run: onSearchValueChange } = useDebounceFn(
     async (value: string) => {
       setSearchValue(value);
-      setCategories(await getCategoryList(value));
+      const res = await getCategoryList(value);
+      if (res.data) {
+        setCategories(res.data);
+      }
     },
     {
       wait: 200,
@@ -60,10 +64,7 @@ const CategorySelect = ({
   );
 
   useEffect(() => {
-    async function run() {
-      setCategories(await getCategoryList());
-    }
-    run();
+    onSearchValueChange('');
   }, []);
 
   return (

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { FilterIcon } from "lucide-react";
 
-import { ArticleStatus } from "@prisma/client";
+import { ArticleStatus, Category } from "@prisma/client";
 
 import {
   DropdownMenu,
@@ -22,26 +22,49 @@ import { cn } from "@/lib/utils";
 import ArticleViewer from "@/components/ArticleViewer";
 
 import ViewerToolBar from "./_components/ViewerToolBar";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { getCategoryList } from "@repo/database/services/category";
 
 const page = () => {
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<ArticleStatus | undefined>();
-  const [categroId, setCategoryId] = useState<string | undefined>();
+  const [categroId, setCategoryId] = useState<string>(" ");
 
-  const { fetch, data, setData, loading } = useList(
+  const [categoryList, setCategoryList] = useState<Category[]>();
+  const { fetch, data, setData, loading, debounceFetch } = useList(
     { keyword, status, categroId },
     getArticleList,
   );
 
-  const [actionArticleItem, setActionArticleItem] =
-    useState<(typeof data)["0"]>();
+  const [actionItemId, setActionItemId] = useState<string>();
+
+  const actionArticleItem = data.find((item) => item.id === actionItemId);
 
   useEffect(() => {
-    setActionArticleItem(data?.at(0));
-  }, [data]);
+    async function fetchCategoryList() {
+      const res = await getCategoryList();
+      if (res.data) {
+        setCategoryList(res.data);
+      }
+    }
 
-  useEffect(() => {
-    fetch();
+    async function run() {
+      fetchCategoryList();
+
+      const res = await fetch();
+
+      if (res?.list.length) {
+        setActionItemId(res.list[0].id);
+      }
+    }
+
+    run();
   }, []);
 
   return (
@@ -53,13 +76,32 @@ const page = () => {
             value={keyword}
             onChange={(e) => {
               setKeyword(e.target.value);
-              fetch();
+              debounceFetch();
             }}
             placeholder="Search article by keywords"
           />
 
+          <Select
+            onValueChange={(value) => {
+              setCategoryId(value);
+              fetch();
+            }}
+            value={categroId}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Category" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value=" ">All</SelectItem>
+              {categoryList?.map((item) => (
+                <SelectItem key={item.id} value={item.id}>
+                  {item.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
           {/* TODO:目录筛选 */}
-          
+
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="outline">
@@ -109,7 +151,7 @@ const page = () => {
                     "bg-muted": actionArticleItem?.id === item.id,
                   },
                 )}
-                onClick={() => setActionArticleItem(item)}
+                onClick={() => setActionItemId(item.id)}
               >
                 <div className="flex justify-between">
                   <h4 className="font-bold">{item.title}</h4>
@@ -145,11 +187,11 @@ const page = () => {
               status={actionArticleItem?.status}
               setData={setData}
             />
+            <div className="py-2">
+              <ArticleViewer id={actionArticleItem?.id} />
+            </div>
           </>
         )}
-        <div className="py-2">
-          <ArticleViewer id={actionArticleItem?.id} />
-        </div>
       </section>
     </section>
   );

@@ -23,7 +23,8 @@ import {
 } from "@repo/database/services/article";
 import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 import { Dayjs } from "dayjs";
-import { toast } from "@/components/ui/use-toast";
+import { useToast } from "@/hooks/use-toast";
+
 const ViewerToolBar = ({
   id,
   status,
@@ -33,47 +34,119 @@ const ViewerToolBar = ({
   id: string;
   setData: Dispatch<SetStateAction<ArticleListItem[]>>;
 }) => {
-  const {
-    show: showDeleteModal,
-    contextHandler,
-    close: closeDeleteModal,
-  } = useModal({
-    danger: true,
-    title: "Confirm Delete",
-    description:
-      "After deleting, you will not be able to recover this article.",
-    content: "Are you sure you want to delete this article?",
-    onConfirm: async () => {
-      const token = getToken();
-      if (id && token) {
-        const res = await deleteArticle({ id }, token);
-        if (res.data) {
-          setData((prev) =>
-            prev.map((item) => ({
-              ...item,
-              status:
-                item.id === res.data ? ArticleStatus.DELETED : item.status,
-            })),
-          );
-          closeDeleteModal();
-        } else {
-          toast({
-            title: "Delete Failed",
-            description: "Please try again later.",
-            variant: "destructive",
-          });
-        }
-      }
-    },
-  });
+  const { show, contextHandler, close } = useModal();
 
   const [open, setOpen] = useState(false);
 
   const [expiredAt, setExpiredAt] = useState<Dayjs>();
 
+  const { toast } = useToast();
+  const onDelete = () => {
+    show({
+      danger: true,
+      title: "Confirm Delete",
+      description:
+        "After deleting, you will not be able to recover this article.",
+      content: "Are you sure you want to delete this article?",
+      onConfirm: async () => {
+        const token = getToken();
+        if (id && token) {
+          const res = await deleteArticle({ id }, token);
+          if (res.data) {
+            setData((prev) =>
+              prev.map((item) => ({
+                ...item,
+                status:
+                  item.id === res.data ? ArticleStatus.DELETED : item.status,
+              })),
+            );
+            close();
+          } else {
+            toast({
+              title: "Delete Failed",
+              description: "Please try again later.",
+              variant: "destructive",
+            });
+          }
+        }
+      },
+    });
+  };
+
+  const onRevert = async () => {
+    show({
+      title: "Confirm Revert",
+      content: "Are you sure you want to revert this article?",
+      onConfirm: async () => {
+        const token = getToken();
+        if (id && token) {
+          const res = await putUpdateArticle(
+            { id, status: ArticleStatus.UNPUBLISHED },
+            getToken(),
+          );
+          if (res.data) {
+            setData((prev) =>
+              prev.map((item) => ({
+                ...item,
+                status:
+                  item.id === res.data.id
+                    ? ArticleStatus.UNPUBLISHED
+                    : item.status,
+              })),
+            );
+
+            toast({
+              title: "Revert Success",
+              description: "The article has been reviewed.",
+            });
+            close();
+          } else {
+            toast({
+              title: "Revert Failed",
+              description: "Please try again later.",
+            });
+          }
+        }
+      },
+    });
+  };
+
   const onReview = async () => {
-    // 置为待发布
-    putUpdateArticle({ id, status: ArticleStatus.UNPUBLISHED }, getToken());
+    show({
+      title: "Confirm Review",
+      content: "Are you sure you want to review this article?",
+      onConfirm: async () => {
+        const token = getToken();
+        if (id && token) {
+          const res = await putUpdateArticle(
+            { id, status: ArticleStatus.UNPUBLISHED },
+            getToken(),
+          );
+          if (res.data) {
+            setData((prev) =>
+              prev.map((item) => ({
+                ...item,
+                status:
+                  item.id === res.data.id
+                    ? ArticleStatus.UNPUBLISHED
+                    : item.status,
+              })),
+            );
+
+            toast({
+              title: "Reviewed Success",
+              description: "The article has been reviewed.",
+            });
+            close();
+          } else {
+            toast({
+              title: "Reviewed Failed",
+              description: "Please try again later.",
+            });
+          }
+        }
+      },
+    });
   };
   const onPublish = async () => {
     const res = await postPulishArticle({ id, type: "now" }, getToken());
@@ -132,7 +205,7 @@ const ViewerToolBar = ({
           size="icon"
           variant="ghost"
           disabled={status === ArticleStatus.DELETED}
-          onClick={() => showDeleteModal()}
+          onClick={() => onDelete()}
         >
           <Trash />
         </Button>
@@ -154,7 +227,8 @@ const ViewerToolBar = ({
           <Button
             size="icon"
             variant="ghost"
-            disabled={status === ArticleStatus.PUBLISHED}
+            disabled={status !== ArticleStatus.PUBLISHED}
+            onClick={() => onRevert()}
           >
             <CornerUpLeft />
           </Button>

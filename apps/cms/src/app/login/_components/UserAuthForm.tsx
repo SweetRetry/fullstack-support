@@ -15,8 +15,9 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { login } from "@repo/database/services/auth";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
+
 import { setToken } from "@/lib/tokenUtil";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   email: z.string().email().min(1, { message: "Email is required" }),

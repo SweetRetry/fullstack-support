@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from "react";
 import { ResponseData } from "@repo/database/types/response";
 import { debounce } from "lodash-es";
 
-export function delay(ms:number) {
+export function delay(ms: number) {
   return new Promise((resolve) => {
     setTimeout(() => {
       resolve(true);
@@ -46,7 +46,7 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
 
   const canPreviousPage = pageId > 1;
 
-  const _fetch = useCallback(async () => {
+  const fetch = useCallback(async () => {
     setLoading(true);
 
     const [{ code, data, message }, _] = await Promise.all([
@@ -63,10 +63,16 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
     }
     setLoading(false);
 
-    return data || [];
+    return (
+      data || {
+        list: [],
+        totalPage: 0,
+        totalCount: 0,
+      }
+    );
   }, [service, options]);
 
-  const fetch = debounce(async () => await _fetch(), 200);
+  const debounceFetch = debounce(async () => await fetch(), 200);
 
   const nextPage = () => {
     // 检查可否下一页
@@ -112,6 +118,7 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
     setData,
     error,
     fetch,
+    debounceFetch,
     nextPage,
     previousPage,
     onPageIdChange,
