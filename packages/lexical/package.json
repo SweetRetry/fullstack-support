@@ -4,7 +4,8 @@
   "exports": {
     "./components/*": "./src/components/*.tsx",
     "./config/*": "./src/config/*.ts",
-    "./utils/*": "./src/utils/*.ts"
+    "./utils/*": "./src/utils/*.ts",
+    "./nodes/*": "./src/nodes/*.tsx"
   },
   "dependencies": {
     "@lexical/code": "^0.17.0",

@@ -17,7 +17,7 @@ import { AutoLinkNode, LinkNode } from "@lexical/link";
 import { CodeNode, CodeHighlightNode } from "@lexical/code";
 import { ListNode, ListItemNode } from "@lexical/list";
 import { HeadingNode, QuoteNode } from "@lexical/rich-text";
-import { ImageNode } from "./editor/nodes/ImageNode";
+import { ImageNode } from "../nodes/ImageNode";
 
 const editorConfig: InitialConfigType = {
   namespace: "Article Viewer",
