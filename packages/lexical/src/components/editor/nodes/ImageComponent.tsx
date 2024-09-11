@@ -160,7 +160,7 @@ export default function ImageComponent({
       }
       return false;
     },
-    [editor, isSelected],
+    [editor, isSelected]
   );
 
   const $onEnter = useCallback(
@@ -180,7 +180,7 @@ export default function ImageComponent({
       }
       return false;
     },
-    [isSelected],
+    [isSelected]
   );
 
   const $onEscape = useCallback(
@@ -198,7 +198,7 @@ export default function ImageComponent({
       }
       return false;
     },
-    [editor, setSelected],
+    [editor, setSelected]
   );
 
   const onClick = useCallback(
@@ -221,7 +221,7 @@ export default function ImageComponent({
 
       return false;
     },
-    [isResizing, isSelected, setSelected, clearSelection],
+    [isResizing, isSelected, setSelected, clearSelection]
   );
 
   const onRightClick = useCallback(
@@ -236,12 +236,12 @@ export default function ImageComponent({
         ) {
           editor.dispatchCommand(
             RIGHT_CLICK_IMAGE_COMMAND,
-            event as MouseEvent,
+            event as MouseEvent
           );
         }
       });
     },
-    [editor],
+    [editor]
   );
 
   useEffect(() => {
@@ -259,17 +259,17 @@ export default function ImageComponent({
           activeEditorRef.current = activeEditor;
           return false;
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand<MouseEvent>(
         CLICK_COMMAND,
         onClick,
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand<MouseEvent>(
         RIGHT_CLICK_IMAGE_COMMAND,
         onClick,
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         DRAGSTART_COMMAND,
@@ -282,24 +282,24 @@ export default function ImageComponent({
           }
           return false;
         },
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         KEY_DELETE_COMMAND,
         $onDelete,
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(
         KEY_BACKSPACE_COMMAND,
         $onDelete,
-        COMMAND_PRIORITY_LOW,
+        COMMAND_PRIORITY_LOW
       ),
       editor.registerCommand(KEY_ENTER_COMMAND, $onEnter, COMMAND_PRIORITY_LOW),
       editor.registerCommand(
         KEY_ESCAPE_COMMAND,
         $onEscape,
-        COMMAND_PRIORITY_LOW,
-      ),
+        COMMAND_PRIORITY_LOW
+      )
     );
 
     rootElement?.addEventListener("contextmenu", onRightClick);
@@ -325,7 +325,7 @@ export default function ImageComponent({
 
   const onResizeEnd = (
     nextWidth: "inherit" | number,
-    nextHeight: "inherit" | number,
+    nextHeight: "inherit" | number
   ) => {
     // Delay hiding the resize bars for click case
     setTimeout(() => {

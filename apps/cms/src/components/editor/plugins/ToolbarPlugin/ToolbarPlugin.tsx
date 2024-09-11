@@ -48,10 +48,11 @@ import { cn } from "@/lib/utils";
 import { sanitizeUrl } from "@/lib/url";
 import { getSelectedNode } from "@/lib/getSelectedNode";
 import { $isHeadingNode } from "@lexical/rich-text";
-import { BlockType, blockTypeToBlockNameMap } from ".";
+import { BlockType, blockTypeToBlockNameMap } from "./tool";
 import { $isParentElementRTL } from "@lexical/selection";
 import { InsertImageDialog } from "../ImagesPlugin";
 import { Modal } from "@/components/ui-extends/Modal";
+import dynamic from "next/dynamic";
 
 export default function ToolbarPlugin({
   setIsLinkEditMode,
@@ -247,6 +248,12 @@ export default function ToolbarPlugin({
 
       <BlockFormatDropdown editor={activeEditor} blockType={blockType} />
 
+      <Separator orientation="vertical" />
+
+      <AlignPlugin elementFormat={elementFormat} isRTL={isRTL} />
+
+      <Separator orientation="vertical" />
+
       <Button
         variant="ghost"
         size="icon"
@@ -299,12 +306,6 @@ export default function ToolbarPlugin({
       >
         <Link width={20} height={20} />
       </Button>
-
-      <Separator orientation="vertical" className="h-full" />
-
-      <AlignPlugin elementFormat={elementFormat} isRTL={isRTL} />
-
-      <Separator orientation="vertical" className="h-full" />
 
       <Button
         variant="ghost"

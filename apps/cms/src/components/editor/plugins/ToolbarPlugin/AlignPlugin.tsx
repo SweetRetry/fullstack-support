@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { ElementFormatType, FORMAT_ELEMENT_COMMAND } from "lexical";
-import { AlignLeft, AlignCenter, AlignRight, AlignJustify } from "lucide-react";
+import { AlignLeft, AlignCenter, AlignRight, AlignJustify, ChevronDown } from "lucide-react";
 import React from "react";
 
 const elementFormatType: Record<
@@ -62,6 +62,7 @@ const AlignPlugin = ({
         <Button variant="ghost" size="sm" className="capitalize">
           <span className="mr-1">{formatOption.icon}</span>
           {formatOption.label}
+          <ChevronDown width={16} height={16} className="ml-2" />
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent>

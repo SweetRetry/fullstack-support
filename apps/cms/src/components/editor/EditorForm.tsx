@@ -22,7 +22,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 import { useWindowUnload } from "@/hooks/useWindowUnload";
-import Editor from "./_components/Editor";
+import Editor from "./Editor";
 import { useEditorForm } from "./useEditorForm";
 import {
   postSaveActical,
@@ -30,6 +30,7 @@ import {
 } from "@repo/database/services/article";
 import { getToken } from "@/lib/tokenUtil";
 import { useToast } from "@/hooks/use-toast";
+import ButtonLoading from "../ui-extends/ButtonLoading";
 
 function EditorForm({ id }: { id: string }) {
   const { form, title, categoryId, editor } = useEditorForm(id);
@@ -38,9 +39,11 @@ function EditorForm({ id }: { id: string }) {
 
   const { toast } = useToast();
 
-  const [open, setOpen] = useState(false);
+  const [publishModalOpen, setPublishModalOpen] = useState(false);
 
   const router = useRouter();
+
+  const [loading, setLoading] = useState(false);
 
   const onSave = async ({
     onSuccess,
@@ -52,6 +55,7 @@ function EditorForm({ id }: { id: string }) {
     ) => void;
     onFailed?: (res: Awaited<ReturnType<typeof postSaveActical>>) => void;
   }) => {
+    setLoading(true);
     const content = editor.getEditorState().toJSON();
     let _description: string = form.getValues("description") || "";
 
@@ -94,13 +98,17 @@ function EditorForm({ id }: { id: string }) {
         onSuccess?.(res);
       }
     }
+
+    setLoading(false);
   };
 
   const onSaveWrapper = () =>
     onSave({
       onSuccess(res) {
-        router.replace(`/article`);
-        setArticleId(res.data.id);
+        if (!articleId) {
+          router.replace(`/articles/editor/draft/${res.data.id}`);
+          return;
+        }
         toast({
           title,
           description: "The article has been saved successfully",
@@ -113,12 +121,13 @@ function EditorForm({ id }: { id: string }) {
     onSave({
       onSuccess(res) {
         setArticleId(res.data.id);
-        setOpen(true);
+        setPublishModalOpen(true);
       },
     });
 
   const onPublish = async () => {
     if (!categoryId) return;
+    setLoading(true);
 
     const res = await putUpdateArticle(
       {
@@ -133,15 +142,22 @@ function EditorForm({ id }: { id: string }) {
     );
 
     if (res.code === 200) {
-      setOpen(false);
-      router.push(`/faq/article/${articleId}`);
+      setPublishModalOpen(false);
+      toast({
+        title: "发布成功",
+        description: "文章发布成功",
+      });
+      router.replace("/articles");
     }
+
+    setLoading(false);
   };
 
-  useWindowUnload();
+  // useWindowUnload();
 
   return (
     <main className="container rounded bg-background">
+      {articleId && <span>Your article has been saved by the system</span>}
       <header className="flex h-16 items-center justify-between px-6">
         <Input
           className="h-12 max-w-[60%] rounded-none border-0 p-0 text-xl placeholder:text-xl focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -150,11 +166,16 @@ function EditorForm({ id }: { id: string }) {
           onChange={(e) => form.setValue("title", e.target.value)}
         />
         <div className="flex items-center gap-2">
-          {articleId && <span>Your article has been saved by the system</span>}
-          <Button variant="secondary" onClick={onSaveWrapper}>
+          <ButtonLoading
+            variant="secondary"
+            onClick={onSaveWrapper}
+            loading={loading}
+          >
             Save
-          </Button>
-          <Button onClick={() => beforePublish()}>Publish</Button>
+          </ButtonLoading>
+          <ButtonLoading loading={loading} onClick={() => beforePublish()}>
+            Publish
+          </ButtonLoading>
         </div>
       </header>
 
@@ -162,7 +183,7 @@ function EditorForm({ id }: { id: string }) {
         <Editor />
       </section>
 
-      <Modal title="Select category" open={open} setOpen={setOpen}>
+      <Modal title="Select category" open={publishModalOpen} setOpen={setPublishModalOpen}>
         <div className="space-y-4">
           <Form {...form}>
             <form
@@ -231,7 +252,7 @@ function EditorForm({ id }: { id: string }) {
           <div className="mt-4 flex justify-end gap-2">
             <Button
               variant="secondary"
-              onClick={() => setOpen(false)}
+              onClick={() => setPublishModalOpen(false)}
               className="mobile:flex-1"
             >
               Cancel

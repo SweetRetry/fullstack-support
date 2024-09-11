@@ -13,6 +13,11 @@ import { RichTextPlugin } from "@lexical/react/LexicalRichTextPlugin";
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { Article } from "@prisma/client";
 import { formatToUtcTime } from "@repo/utils/dayjsUtil";
+import { AutoLinkNode, LinkNode } from "@lexical/link";
+import { CodeNode, CodeHighlightNode } from "@lexical/code";
+import { ListNode, ListItemNode } from "@lexical/list";
+import { HeadingNode, QuoteNode } from "@lexical/rich-text";
+import { ImageNode } from "./editor/nodes/ImageNode";
 
 const editorConfig: InitialConfigType = {
   namespace: "Article Viewer",
@@ -21,6 +26,17 @@ const editorConfig: InitialConfigType = {
     console.error(e);
   },
   editable: false,
+  nodes: [
+    HeadingNode,
+    AutoLinkNode,
+    LinkNode,
+    ListNode,
+    ListItemNode,
+    QuoteNode,
+    CodeNode,
+    CodeHighlightNode,
+    ImageNode,
+  ],
 };
 const Viewer = ({ content }: { content: string }) => {
   const [editor] = useLexicalComposerContext();

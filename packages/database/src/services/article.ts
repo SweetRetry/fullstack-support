@@ -134,6 +134,7 @@ export async function postSaveActical(
   token: string
 ) {
   try {
+
     const hasPermission = await PermissionUtil.checkPermission(
       token,
       "article:edit"
@@ -150,7 +151,6 @@ export async function postSaveActical(
     });
 
     const { success } = schema.safeParse(data);
-
     if (!success) {
       return IResponse.Error(500, "params error");
     }

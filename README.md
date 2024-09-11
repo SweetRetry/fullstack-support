@@ -44,7 +44,7 @@
 - [x] Basic edit function
 - [x] Timed Releases plugin
 - [x] insert link plugin
-- [ ] insert image plugin
+- [x] insert image plugin
 - [ ] Need insert video plugin?
 
 ### user (role)

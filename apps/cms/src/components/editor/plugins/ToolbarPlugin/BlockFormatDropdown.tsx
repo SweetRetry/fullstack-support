@@ -27,7 +27,7 @@ import {
   INSERT_UNORDERED_LIST_COMMAND,
 } from "@lexical/list";
 import { $createCodeNode } from "@lexical/code";
-import { BlockType, blockTypeToBlockNameMap } from ".";
+import { BlockType, blockTypeToBlockNameMap } from "./tool";
 
 export const BlockFormatDropdown = ({
   editor,

@@ -15,8 +15,9 @@ import LexicalAutoLinkPlugin from "./plugins/AutoLinkPlugin";
 import FloatingLinkEditorPlugin from "./plugins/FloatingLinkEditorPlugin";
 // import TreeViewPlugin from "./plugins/TreeViewPlugin";
 import LinkPlugin from "./plugins/LinkPlugin";
-import ImagesPlugin from "./plugins/ImagesPlugin";
 
+import dynamic from "next/dynamic";
+const ImagesPlugin = dynamic(() => import("./plugins/ImagesPlugin"));
 function Editor() {
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);

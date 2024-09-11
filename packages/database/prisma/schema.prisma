@@ -55,7 +55,7 @@ enum ArticleStatus {
 model Article {
   id          String        @id @default(cuid())
   title       String
-  content     String        @db.Text
+  content     String        @db.LongText
   description String        @db.Text
   status      ArticleStatus @default(DRAFT)
   createdAt   DateTime      @default(now()) @map("created_at")

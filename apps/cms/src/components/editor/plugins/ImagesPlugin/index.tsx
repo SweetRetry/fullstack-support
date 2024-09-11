@@ -60,28 +60,36 @@ export function InsertImageUriDialogBody({
   const isDisabled = src === "";
 
   return (
-    <>
-      <Input
-        placeholder="i.e. https://source.unsplash.com/random"
-        onChange={(e) => setSrc(e.target.value)}
-        value={src}
-        data-test-id="image-modal-url-input"
-      />
-      <Input
-        placeholder="Random unsplash image"
-        onChange={(e) => setAltText(e.target.value)}
-        value={altText}
-        data-test-id="image-modal-alt-text-input"
-      />
+    <div className="space-y-3">
+      <div>
+        <label>URL</label>
+        <Input
+          placeholder="i.e. https://source.unsplash.com/random"
+          onChange={(e) => setSrc(e.target.value)}
+          value={src}
+          data-test-id="image-modal-url-input"
+        />
+      </div>
+
+      <div>
+        <label>Alt text</label>
+        <Input
+          placeholder="Random unsplash image"
+          onChange={(e) => setAltText(e.target.value)}
+          value={altText}
+          data-test-id="image-modal-alt-text-input"
+        />
+      </div>
 
       <Button
         data-test-id="image-modal-confirm-btn"
+        className="block w-full"
         disabled={isDisabled}
         onClick={() => onClick({ altText, src })}
       >
         Confirm
       </Button>
-    </>
+    </div>
   );
 }
 
@@ -109,28 +117,35 @@ export function InsertImageUploadedDialogBody({
   };
 
   return (
-    <>
-      <Input
-        type="file"
-        onChange={(e) => loadImage(e.target.files)}
-        accept="image/*"
-        data-test-id="image-modal-file-upload"
-      />
-      <Input
-        placeholder="Descriptive alternative text"
-        onChange={(e) => setAltText(e.target.value)}
-        value={altText}
-        data-test-id="image-modal-alt-text-input"
-      />
+    <div className="space-y-3">
+      <div>
+        <label>Upload File</label>
+        <Input
+          type="file"
+          onChange={(e) => loadImage(e.target.files)}
+          accept="image/*"
+          data-test-id="image-modal-file-upload"
+        />
+      </div>
+      <div>
+        <label>Alt text</label>
+        <Input
+          placeholder="Descriptive alternative text"
+          onChange={(e) => setAltText(e.target.value)}
+          value={altText}
+          data-test-id="image-modal-alt-text-input"
+        />
+      </div>
 
       <Button
         data-test-id="image-modal-file-upload-btn"
+        className="block w-full"
         disabled={isDisabled}
         onClick={() => onClick({ altText, src })}
       >
         Confirm
       </Button>
-    </>
+    </div>
   );
 }
 
