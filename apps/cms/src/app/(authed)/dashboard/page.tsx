@@ -4,7 +4,7 @@ import RecentPublished from "./_components/RecentPublished";
 import ArticleChart from "./_components/ArticleChart";
 const page = () => {
   return (
-    <main >
+    <main>
       <ArticleChart />
       <RecentPublished />
     </main>

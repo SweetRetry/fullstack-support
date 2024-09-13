@@ -20,10 +20,11 @@ import {
 import { useSize } from "ahooks";
 
 import { X } from "lucide-react";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import { useState } from "react";
 import ButtonLoading from "./ButtonLoading";
 import { cn } from "@/lib/utils";
+import { VariantProps } from "class-variance-authority";
 
 export function Modal({
   title,
@@ -108,7 +109,7 @@ interface UseModalConfig {
   width?: string | number;
   onConfirm: () => Promise<void> | void;
   onCancel?: () => void;
-  danger?: boolean;
+  variant?: VariantProps<typeof buttonVariants>["variant"];
 }
 
 // 封装useModalHook
@@ -122,6 +123,7 @@ export function useModal() {
     description: "",
     onConfirm: () => {},
     onCancel: () => {},
+    variant: "default",
   });
 
   const show = ({
@@ -130,6 +132,7 @@ export function useModal() {
     description,
     onConfirm,
     onCancel,
+    variant,
   }: UseModalConfig) => {
     setState({
       title,
@@ -137,6 +140,7 @@ export function useModal() {
       description,
       onConfirm,
       onCancel,
+      variant: variant || "default",
     });
     setOpen(true);
   };
@@ -162,7 +166,7 @@ export function useModal() {
             Cancel
           </Button>
           <ButtonLoading
-            variant={state.danger ? "destructive" : "default"}
+            variant={state.variant}
             loading={loading}
             onClick={async () => {
               setLoading(true);

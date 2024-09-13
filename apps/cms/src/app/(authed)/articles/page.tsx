@@ -11,7 +11,11 @@ import { ArticleStatus, Category } from "@prisma/client";
 
 import {
   DropdownMenu,
+  DropdownMenuGroup,
   DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { DropdownMenuContent } from "@radix-ui/react-dropdown-menu";
@@ -30,15 +34,18 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { getCategoryList } from "@repo/database/services/category";
+import { Modal } from "@/components/ui-extends/Modal";
 
 const page = () => {
   const [keyword, setKeyword] = useState("");
-  const [status, setStatus] = useState<ArticleStatus | undefined>();
-  const [categroId, setCategoryId] = useState<string>(" ");
+  const [status, setStatus] = useState<ArticleStatus>();
+  const [categoryId, setCategoryId] = useState<string>(" ");
+
+  const [filterModalOpen, setFilterModalOpen] = useState(false);
 
   const [categoryList, setCategoryList] = useState<Category[]>();
-  const { fetch, data, setData, loading, debounceFetch } = useList(
-    { keyword, status, categroId },
+  const { fetch, data, setData, loading, debounceFetch, params } = useList(
+    { keyword, status, categoryId },
     getArticleList,
   );
 
@@ -46,17 +53,15 @@ const page = () => {
 
   const actionArticleItem = data.find((item) => item.id === actionItemId);
 
-  useEffect(() => {
-    async function fetchCategoryList() {
-      const res = await getCategoryList();
-      if (res.data) {
-        setCategoryList(res.data);
-      }
+  async function fetchCategoryList() {
+    const res = await getCategoryList();
+    if (res.data && !categoryList?.length) {
+      setCategoryList(res.data);
     }
+  }
 
+  useEffect(() => {
     async function run() {
-      fetchCategoryList();
-
       const res = await fetch();
 
       if (res?.list.length) {
@@ -69,7 +74,7 @@ const page = () => {
 
   return (
     <section className="flex h-full space-x-4 border-t border-border">
-      <section className="w-1/3 min-w-[500px]">
+      <section className="w-1/3 min-w-[400px]">
         <div className="flex h-12 items-center justify-between space-x-4">
           <Input
             className="max-w-[250px]"
@@ -81,56 +86,16 @@ const page = () => {
             placeholder="Search article by keywords"
           />
 
-          <Select
-            onValueChange={(value) => {
-              setCategoryId(value);
-              fetch();
+          <Button
+            variant="outline"
+            onClick={() => {
+              fetchCategoryList();
+              setFilterModalOpen(true);
             }}
-            value={categroId}
           >
-            <SelectTrigger>
-              <SelectValue placeholder="Category" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value=" ">All</SelectItem>
-              {categoryList?.map((item) => (
-                <SelectItem key={item.id} value={item.id}>
-                  {item.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          {/* TODO:目录筛选 */}
-
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <FilterIcon width={20} height={20} className="mr-1" />
-                <span> Filter</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="z-10 bg-background shadow">
-              <DropdownMenuItem
-                onClick={() => {
-                  setStatus(undefined);
-                  fetch();
-                }}
-              >
-                All
-              </DropdownMenuItem>
-              {Object.values(ArticleStatus).map((item) => (
-                <DropdownMenuItem
-                  key={item}
-                  onClick={() => {
-                    setStatus(item);
-                    fetch();
-                  }}
-                >
-                  {item}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+            <FilterIcon width={20} height={20} className="mr-1" />
+            <span>Filter</span>
+          </Button>
         </div>
 
         <ul
@@ -140,7 +105,7 @@ const page = () => {
           }}
         >
           {loading ? (
-            <LoadingSpinner className="" />
+            <LoadingSpinner />
           ) : (
             data.map((item) => (
               <li
@@ -153,16 +118,16 @@ const page = () => {
                 )}
                 onClick={() => setActionItemId(item.id)}
               >
-                <div className="flex justify-between">
+                <div className="flex items-center justify-between">
                   <h4 className="font-bold">{item.title}</h4>
-                  <p>{formatToUtcTime(item.updatedAt)}</p>
+                  <p className="text-sm">{formatToUtcTime(item.updatedAt)}</p>
                 </div>
 
                 <p className="my-4 text-muted-foreground">{item.description}</p>
-                <div className="flex items-center justify-between text-sm">
+                <div className="flex items-center space-x-2 text-sm">
                   <span
                     className={cn(
-                      "mt-2 rounded border border-border bg-foreground px-2 py-1 text-background",
+                      "mt-2 rounded-full border border-border px-2 py-1",
                       {
                         invisible: !item.category?.id,
                       },
@@ -171,7 +136,16 @@ const page = () => {
                     {item.category?.name}
                   </span>
 
-                  <span>{item.status}</span>
+                  <span
+                    className={cn(
+                      "mt-2 rounded-full border border-border px-2 py-1",
+                      {
+                        invisible: !item.category?.id,
+                      },
+                    )}
+                  >
+                    {item.status}
+                  </span>
                 </div>
               </li>
             ))
@@ -179,7 +153,7 @@ const page = () => {
         </ul>
       </section>
 
-      <section className="flex-1 border-l border-border px-4">
+      <section className="flex-1 border-l border-border pl-4">
         {actionArticleItem && (
           <>
             <ViewerToolBar
@@ -193,6 +167,56 @@ const page = () => {
           </>
         )}
       </section>
+
+      <Modal open={filterModalOpen} setOpen={setFilterModalOpen} title="Filter">
+        <Select
+          onValueChange={(value) => {
+            setCategoryId(value);
+            params.current.categoryId = value;
+            fetch();
+          }}
+          value={categoryId}
+        >
+          <SelectTrigger>
+            <SelectValue placeholder="Category" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value=" ">All</SelectItem>
+            {categoryList?.map((item) => (
+              <SelectItem key={item.id} value={item.id}>
+                {item.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">
+              <FilterIcon width={20} height={20} className="mr-1" />
+              <span>Filter</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="z-10 bg-background shadow">
+            <DropdownMenuRadioGroup
+              value={status}
+              onValueChange={(value: string) => {
+                setStatus(value as ArticleStatus);
+                params.current.status = value as ArticleStatus;
+                fetch();
+              }}
+            >
+              <DropdownMenuLabel>状态</DropdownMenuLabel>
+              <DropdownMenuRadioItem value={""}>All</DropdownMenuRadioItem>
+              {Object.values(ArticleStatus).map((item) => (
+                <DropdownMenuRadioItem key={item} value={item}>
+                  {item}
+                </DropdownMenuRadioItem>
+              ))}
+            </DropdownMenuRadioGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </Modal>
     </section>
   );
 };

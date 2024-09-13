@@ -39,7 +39,7 @@ function EditorForm({ id }: { id: string }) {
 
   const { toast } = useToast();
 
-  const [publishModalOpen, setPublishModalOpen] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const router = useRouter();
 
@@ -121,7 +121,7 @@ function EditorForm({ id }: { id: string }) {
     onSave({
       onSuccess(res) {
         setArticleId(res.data.id);
-        setPublishModalOpen(true);
+        setModalOpen(true);
       },
     });
 
@@ -135,14 +135,14 @@ function EditorForm({ id }: { id: string }) {
         categoryId,
         title,
         description: form.getValues("description"),
-        status: ArticleStatus.PUBLISHED,
+        status: ArticleStatus.UNDER_REVIEW,
         updatedAt: new Date(),
       },
       getToken(),
     );
 
     if (res.code === 200) {
-      setPublishModalOpen(false);
+      setModalOpen(false);
       toast({
         title: "发布成功",
         description: "文章发布成功",
@@ -173,8 +173,9 @@ function EditorForm({ id }: { id: string }) {
           >
             Save
           </ButtonLoading>
+
           <ButtonLoading loading={loading} onClick={() => beforePublish()}>
-            Publish
+            Review
           </ButtonLoading>
         </div>
       </header>
@@ -183,7 +184,7 @@ function EditorForm({ id }: { id: string }) {
         <Editor />
       </section>
 
-      <Modal title="Select category" open={publishModalOpen} setOpen={setPublishModalOpen}>
+      <Modal title="Select category" open={modalOpen} setOpen={setModalOpen}>
         <div className="space-y-4">
           <Form {...form}>
             <form
@@ -250,16 +251,10 @@ function EditorForm({ id }: { id: string }) {
           </Form>
 
           <div className="mt-4 flex justify-end gap-2">
-            <Button
-              variant="secondary"
-              onClick={() => setPublishModalOpen(false)}
-              className="mobile:flex-1"
-            >
+            <Button variant="secondary" onClick={() => setModalOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={onPublish} className="mobile:flex-1">
-              Publish
-            </Button>
+            <Button onClick={onPublish}>Publish</Button>
           </div>
         </div>
       </Modal>

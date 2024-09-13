@@ -24,6 +24,7 @@ import {
 import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 import { Dayjs } from "dayjs";
 import { useToast } from "@/hooks/use-toast";
+import { Separator } from "@/components/ui/separator";
 
 const ViewerToolBar = ({
   id,
@@ -43,7 +44,7 @@ const ViewerToolBar = ({
   const { toast } = useToast();
   const onDelete = () => {
     show({
-      danger: true,
+      variant: "destructive",
       title: "Confirm Delete",
       description:
         "After deleting, you will not be able to recover this article.",
@@ -97,7 +98,7 @@ const ViewerToolBar = ({
 
             toast({
               title: "Revert Success",
-              description: "The article has been reviewed.",
+              description: "The article has been reverted.",
             });
             close();
           } else {
@@ -149,20 +150,31 @@ const ViewerToolBar = ({
     });
   };
   const onPublish = async () => {
-    const res = await postPulishArticle({ id, type: "now" }, getToken());
-    if (res.data?.id) {
-      setData((prev) =>
-        prev.map((item) => ({
-          ...item,
-          status:
-            item.id === res.data.id ? ArticleStatus.PUBLISHED : item.status,
-        })),
-      );
-      toast({
-        title: "Publish Success",
-        description: "Your article has been published.",
-      });
-    }
+    show({
+      title: "Confirm Publish",
+      content: "Are you sure you want to publish this article?",
+      onConfirm: async () => {
+        const res = await postPulishArticle({ id, type: "now" }, getToken());
+        if (res.data?.id) {
+          setData((prev) =>
+            prev.map((item) => ({
+              ...item,
+              status:
+                item.id === res.data.id ? ArticleStatus.PUBLISHED : item.status,
+            })),
+          );
+          toast({
+            title: "Publish Success",
+            description: "Your article has been published.",
+          });
+        } else {
+          toast({
+            title: "Publish Failed",
+            description: "Please try again later.",
+          });
+        }
+      },
+    });
   };
   const onFuturePublish = async () => {
     if (expiredAt) {
@@ -180,91 +192,83 @@ const ViewerToolBar = ({
   return (
     <div className="flex h-12 items-center space-x-4 border-b border-border">
       {contextHandler}
-      {checkAuth("article:edit") && (
-        <Button size="icon" variant="ghost">
-          <Link href="/articles/editor/draft/new" className="leading-none">
-            <PlusIcon />
-          </Link>
-        </Button>
-      )}
 
-      {checkAuth("article:edit") && (
-        <Button
-          size="icon"
-          variant="ghost"
-          disabled={status === ArticleStatus.DELETED}
-        >
-          <Link href={`/articles/editor/draft/${id}`} className="leading-none">
-            <Edit />
-          </Link>
-        </Button>
-      )}
+      <Button size="icon" variant="ghost">
+        <Link href="/articles/editor/draft/new" className="leading-none">
+          <PlusIcon />
+        </Link>
+      </Button>
 
-      {checkAuth("article:delete") && (
-        <Button
-          size="icon"
-          variant="ghost"
-          disabled={status === ArticleStatus.DELETED}
-          onClick={() => onDelete()}
-        >
-          <Trash />
-        </Button>
-      )}
+      <Button
+        size="icon"
+        variant="ghost"
+        disabled={status === ArticleStatus.DELETED}
+      >
+        <Link href={`/articles/editor/draft/${id}`} className="leading-none">
+          <Edit />
+        </Link>
+      </Button>
 
-      {checkAuth("article:review") && (
-        <Button
-          size="icon"
-          variant="ghost"
-          disabled={status !== ArticleStatus.UNDER_REVIEW}
-          onClick={() => onReview()}
-        >
-          <Check />
-        </Button>
-      )}
+      <Button
+        size="icon"
+        variant="ghost"
+        disabled={status === ArticleStatus.DELETED}
+        onClick={() => onDelete()}
+      >
+        <Trash />
+      </Button>
 
-      {checkAuth("article:publish") && (
-        <>
-          <Button
-            size="icon"
-            variant="ghost"
-            disabled={status !== ArticleStatus.PUBLISHED}
-            onClick={() => onRevert()}
-          >
-            <CornerUpLeft />
+      <Separator orientation="vertical" />
+
+      <Button
+        size="icon"
+        variant="ghost"
+        disabled={status !== ArticleStatus.UNPUBLISHED}
+        onClick={() => setOpen(true)}
+      >
+        <Timer />
+      </Button>
+
+      <Button
+        size="icon"
+        variant="ghost"
+        disabled={status !== ArticleStatus.PUBLISHED}
+        onClick={() => onRevert()}
+      >
+        <CornerUpLeft />
+      </Button>
+
+      <Button
+        size="icon"
+        variant="ghost"
+        disabled={status !== ArticleStatus.UNPUBLISHED}
+        onClick={() => onPublish()}
+      >
+        <CornerUpRight />
+      </Button>
+
+      <Button
+        size="icon"
+        variant="ghost"
+        disabled={status !== ArticleStatus.UNDER_REVIEW}
+        onClick={() => onReview()}
+      >
+        <Check />
+      </Button>
+
+      <Modal open={open} setOpen={setOpen} title="Timed Publish">
+        <DatePicker
+          showTime
+          className="w-full !rounded"
+          onChange={(date) => setExpiredAt(date)}
+        />
+        <div className="mt-4 space-x-2 text-right">
+          <Button onClick={() => setOpen(false)} variant="secondary">
+            Cancel
           </Button>
-          <Button
-            size="icon"
-            variant="ghost"
-            disabled={status !== ArticleStatus.UNPUBLISHED}
-            onClick={() => onPublish()}
-          >
-            <CornerUpRight />
-          </Button>
-
-          <Button
-            size="icon"
-            variant="ghost"
-            disabled={status !== ArticleStatus.UNPUBLISHED}
-            onClick={() => setOpen(true)}
-          >
-            <Timer />
-          </Button>
-
-          <Modal open={open} setOpen={setOpen} title="Timed Publish">
-            <DatePicker
-              showTime
-              className="w-full !rounded"
-              onChange={(date) => setExpiredAt(date)}
-            />
-            <div className="mt-4 space-x-2 text-right">
-              <Button onClick={() => setOpen(false)} variant="secondary">
-                Cancel
-              </Button>
-              <Button onClick={() => onFuturePublish()}>Confirm</Button>
-            </div>
-          </Modal>
-        </>
-      )}
+          <Button onClick={() => onFuturePublish()}>Confirm</Button>
+        </div>
+      </Modal>
     </div>
   );
 };

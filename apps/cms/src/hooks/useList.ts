@@ -15,9 +15,7 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
     pageId?: number;
     pageSize?: number;
   },
-  service: (
-    params: typeof queryParams & { pageId: number; pageSize: number },
-  ) => Promise<
+  service: (params: P) => Promise<
     ResponseData<{
       list: T[];
       totalPage: number;
@@ -28,9 +26,11 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
     delay?: number;
   },
 ) => {
-  const params = useRef(
-    Object.assign({ pageId: 1, pageSize: 10 }, queryParams),
-  );
+  const params = useRef({
+    ...queryParams,
+    pageId: queryParams.pageId ?? 1,
+    pageSize: queryParams.pageSize ?? 10,
+  } as unknown as P);
 
   params.current = Object.assign(params.current, queryParams);
 
@@ -109,6 +109,7 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
   };
 
   return {
+    params,
     pageId,
     pageSize,
     totalPage,

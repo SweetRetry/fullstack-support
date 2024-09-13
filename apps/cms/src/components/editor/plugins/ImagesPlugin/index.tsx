@@ -32,7 +32,7 @@ import {
   $isImageNode,
   ImageNode,
   ImagePayload,
-} from "@/components/editor/nodes/ImageNode";
+} from "@repo/lexical/nodes/ImageNode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
