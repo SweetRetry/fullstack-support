@@ -8,13 +8,13 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { formatToUtcTime } from "@/lib/dayjsUtil";
 
 import Link from "next/link";
 // import dynamic from "next/dynamic";
 import React from "react";
 import CategoryMenu from "../_components/CategoryMenu";
 import { getCategoryWithArticles } from "@repo/database/services/category";
+import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 
 // const LocalTime = dynamic(() => import("@/components/LocalTime"), {
 //   ssr: false,

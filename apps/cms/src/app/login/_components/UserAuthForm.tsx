@@ -13,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { login } from "@repo/database/services/auth";
+import { login } from "@repo/database/services/user";
 import { useRouter } from "next/navigation";
 
 import { setToken } from "@/lib/tokenUtil";

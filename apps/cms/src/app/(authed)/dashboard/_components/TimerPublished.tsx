@@ -3,42 +3,52 @@ import ArticleViewer from "@/components/ArticleViewer";
 import { LoadingSpinner } from "@/components/LoadingSpinner";
 import { Modal } from "@/components/ui-extends/Modal";
 
-import { useList } from "@/hooks/useList";
 import { formatToUtcTime } from "@repo/utils/dayjsUtil";
-import { ArticleStatus } from "@prisma/client";
-import { getArticleList } from "@repo/database/services/article";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
+
+import { getPendingArticles } from "@repo/database/services/article";
 
 import React, { useEffect, useState } from "react";
+import { Article } from "@prisma/client";
 import { List } from "antd";
 
-const RecentPublished = () => {
+const TimerPublished = () => {
   const [open, setOpen] = useState(false);
 
-  const { data, fetch, loading } = useList(
-    { pageId: 1, pageSize: 4, status: ArticleStatus.PUBLISHED },
-    getArticleList,
+  const [loading, setLoading] = useState(false);
+
+  const [pendingArticles, setPendingArticles] = useState<Article[]>([]);
+
+  const [actionItemId, setActionItemId] = useState("");
+
+  const actionArticle = pendingArticles.find(
+    (item) => item.id === actionItemId,
   );
 
-  const [actionItem, setActionItem] = useState<(typeof data)["0"]>();
-
   useEffect(() => {
-    fetch();
+    async function run() {
+      setLoading(true);
+      const res = await getPendingArticles(5);
+      if (res?.data) {
+        setPendingArticles(res.data);
+      }
+      setLoading(false);
+    }
+
+    run();
   }, []);
 
   return (
     <section className="w-1/2 rounded-lg border border-solid border-border p-4">
-      <h3 className="text-xl font-bold">Recently Published</h3>
+      <h3 className=" text-xl font-bold">Timer Published</h3>
 
       <List
         loading={loading}
-        dataSource={data}
+        dataSource={pendingArticles}
         renderItem={(item) => (
           <List.Item
             onClick={() => {
               setOpen(true);
-              setActionItem(item);
+              setActionItemId(item.id);
             }}
           >
             <List.Item.Meta title={item.title} description={item.description} />
@@ -50,13 +60,13 @@ const RecentPublished = () => {
         )}
       />
 
-      {actionItem && (
-        <Modal title={actionItem?.title} open={open} setOpen={setOpen}>
-          <ArticleViewer id={actionItem.id} />
+      {actionArticle && (
+        <Modal title={actionArticle?.title} open={open} setOpen={setOpen}>
+          <ArticleViewer id={actionArticle.id} />
         </Modal>
       )}
     </section>
   );
 };
 
-export default RecentPublished;
+export default TimerPublished;

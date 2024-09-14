@@ -1,8 +1,6 @@
 import SectionWrap from "@/components/SectionWrap";
 import SearchContainer from "../../components/SearchContainer";
-import { ArticleStatus, prisma } from "@repo/database";
 
-import Link from "next/link";
 import FaqCategories from "@/components/faq/FaqCategories";
 
 export default async function Home() {

@@ -5,6 +5,7 @@ import { z } from "zod";
 import { IResponse } from "../utils/responseUtil";
 import { StatusCodes } from "http-status-codes";
 import Redis from "@repo/redis";
+import RedisClient from "@repo/redis";
 export async function getArticle(id: string) {
   try {
     const article = await prisma.article.findUnique({
@@ -134,7 +135,6 @@ export async function postSaveActical(
   token: string
 ) {
   try {
-
     const hasPermission = await PermissionUtil.checkPermission(
       token,
       "article:edit"
@@ -286,4 +286,22 @@ export async function postPulishArticle(
       "Interval server error"
     );
   }
+}
+
+export async function getPendingArticles(pageSize: number) {
+  const keys = await RedisClient.keys("pending:artcile:*");
+
+  if (!keys.length) return;
+
+  const pendingArticles = await prisma.article.findMany({
+    where: {
+      id: {
+        in: keys.map((key) => key.split(":")[2]),
+      },
+      status: ArticleStatus.PENDING,
+    },
+    take: pageSize ?? 5,
+  });
+
+  return IResponse.Success(pendingArticles);
 }

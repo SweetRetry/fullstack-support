@@ -26,6 +26,7 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
       categoryId: true,
       category: true,
       updatedAt: true,
+      description: true,
     },
   });
 
