@@ -1,12 +1,15 @@
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 
 import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext";
 import { getArticle } from "@repo/database/services/article";
+import { ArticleStatus } from "@prisma/client";
 
 export const useEditorForm = (articalId: string) => {
+  const [status, setStatus] = useState<ArticleStatus | undefined>();
+
   const form = useForm({
     resolver: zodResolver(
       z.object({
@@ -35,6 +38,7 @@ export const useEditorForm = (articalId: string) => {
         form.setValue("description", existArticle.description);
         form.setValue("categoryId", existArticle.categoryId || "");
         editor.setEditorState(editor.parseEditorState(existArticle.content));
+        setStatus(existArticle.status);
       }
     }
     articalId && articalId !== "new" && run();
@@ -45,5 +49,6 @@ export const useEditorForm = (articalId: string) => {
     title,
     categoryId,
     editor,
+    status
   };
 };

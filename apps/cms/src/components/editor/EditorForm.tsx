@@ -33,7 +33,7 @@ import { useToast } from "@/hooks/use-toast";
 import ButtonLoading from "../ui-extends/ButtonLoading";
 
 function EditorForm({ id }: { id: string }) {
-  const { form, title, categoryId, editor } = useEditorForm(id);
+  const { form, title, categoryId, editor, status } = useEditorForm(id);
 
   const [articleId, setArticleId] = useState(id === "new" ? "" : id);
 
@@ -117,7 +117,7 @@ function EditorForm({ id }: { id: string }) {
       },
     });
 
-  const beforePublish = () =>
+  const onPrepareReview = () =>
     onSave({
       onSuccess(res) {
         setArticleId(res.data.id);
@@ -125,7 +125,7 @@ function EditorForm({ id }: { id: string }) {
       },
     });
 
-  const onPublish = async () => {
+  const onReview = async () => {
     if (!categoryId) return;
     setLoading(true);
 
@@ -143,10 +143,6 @@ function EditorForm({ id }: { id: string }) {
 
     if (res.code === 200) {
       setModalOpen(false);
-      toast({
-        title: "发布成功",
-        description: "文章发布成功",
-      });
       router.replace("/articles");
     }
 
@@ -173,10 +169,11 @@ function EditorForm({ id }: { id: string }) {
           >
             Save
           </ButtonLoading>
-
-          <ButtonLoading loading={loading} onClick={() => beforePublish()}>
-            Review
-          </ButtonLoading>
+          {status === ArticleStatus.DRAFT && (
+            <ButtonLoading loading={loading} onClick={() => onPrepareReview()}>
+              Review
+            </ButtonLoading>
+          )}
         </div>
       </header>
 
@@ -254,7 +251,7 @@ function EditorForm({ id }: { id: string }) {
             <Button variant="secondary" onClick={() => setModalOpen(false)}>
               Cancel
             </Button>
-            <Button onClick={onPublish}>Publish</Button>
+            <Button onClick={onReview}>Review</Button>
           </div>
         </div>
       </Modal>

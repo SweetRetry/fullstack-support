@@ -1,6 +1,6 @@
 import { Permission } from "@prisma/client";
 import { getPermissionList } from "@repo/database/services/auth";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import React, { createContext, useEffect, useState } from "react";
 
 const AuthContext = createContext<Permission[]>([]);
@@ -33,4 +33,5 @@ export const checkAuth = (permission: string) => {
   const authList = useAuth();
   return authList.findIndex((item) => item.name === permission) !== -1;
 };
+
 export default AuthProvider;

@@ -11,8 +11,6 @@ import { ArticleStatus, Category } from "@prisma/client";
 
 import {
   DropdownMenu,
-  DropdownMenuGroup,
-  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
@@ -35,11 +33,13 @@ import {
 } from "@/components/ui/select";
 import { getCategoryList } from "@repo/database/services/category";
 import { Modal } from "@/components/ui-extends/Modal";
+import { Empty } from "antd";
+import Link from "next/link";
 
 const page = () => {
   const [keyword, setKeyword] = useState("");
   const [status, setStatus] = useState<ArticleStatus>();
-  const [categoryId, setCategoryId] = useState<string>(" ");
+  const [categoryId, setCategoryId] = useState<string>();
 
   const [filterModalOpen, setFilterModalOpen] = useState(false);
 
@@ -70,6 +70,8 @@ const page = () => {
     }
 
     run();
+
+    document.title = "Articles";
   }, []);
 
   return (
@@ -106,7 +108,7 @@ const page = () => {
         >
           {loading ? (
             <LoadingSpinner />
-          ) : (
+          ) : data.length ? (
             data.map((item) => (
               <li
                 key={item.id}
@@ -149,6 +151,12 @@ const page = () => {
                 </div>
               </li>
             ))
+          ) : (
+            <Empty description="No articles">
+              <Link href="/articles/editor/draft/new">
+                <Button>Create Now</Button>
+              </Link>
+            </Empty>
           )}
         </ul>
       </section>

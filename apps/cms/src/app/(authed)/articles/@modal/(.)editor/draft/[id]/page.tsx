@@ -20,7 +20,6 @@ export default function WriteApp({ params }: { params: { id: string } }) {
       title="Write article"
       limitHeight
       width={900}
-      
     >
       <EditorApp id={params.id}/>
     </Modal>

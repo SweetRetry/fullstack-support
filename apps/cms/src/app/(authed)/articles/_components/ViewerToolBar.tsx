@@ -167,6 +167,7 @@ const ViewerToolBar = ({
             title: "Publish Success",
             description: "Your article has been published.",
           });
+          close();
         } else {
           toast({
             title: "Publish Failed",

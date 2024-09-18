@@ -13,6 +13,7 @@ import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import EditorForm from "./EditorForm";
 import "./theme.css";
 import { ImageNode } from "@repo/lexical/nodes/ImageNode";
+import { ArticleStatus } from "@prisma/client";
 
 const editorConfig: InitialConfigType = {
   namespace: "Article Editor",

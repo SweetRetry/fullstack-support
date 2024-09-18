@@ -7,7 +7,7 @@ const page = () => {
   return (
     <main>
       <ArticleChart />
-      <div className="flex space-x-6">
+      <div className="flex space-x-6 mt-6">
         <RecentPublished />
         <TimerPublished />
       </div>
