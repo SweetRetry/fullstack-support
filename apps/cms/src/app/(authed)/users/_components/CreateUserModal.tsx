@@ -33,9 +33,11 @@ const formSchema = z.object({
 const CreateUserModal = ({
   open,
   setOpen,
+  onSuccess,
 }: {
   open: boolean;
   setOpen: (open: boolean) => void;
+  onSuccess: () => void;
 }) => {
   const form = useForm({
     resolver: zodResolver(formSchema),
@@ -48,13 +50,13 @@ const CreateUserModal = ({
   });
   const [loading, setLoading] = useState(false);
   const onConfirm = async (values: z.infer<typeof formSchema>) => {
-    console.log(form.getValues("roleId"));
     const success = await form.trigger();
     if (!success) return;
     setLoading(true);
     const res = await postCreateUser(values);
     if (res.data?.id) {
       setOpen(false);
+      onSuccess();
     }
     setLoading(false);
   };
@@ -76,7 +78,7 @@ const CreateUserModal = ({
   }, [open]);
 
   return (
-    <Modal title="Edit permission" open={open} setOpen={setOpen}>
+    <Modal title="Create User" open={open} setOpen={setOpen}>
       <div className="space-y-4">
         <Form {...form}>
           <form className="space-y-4">

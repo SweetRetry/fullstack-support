@@ -39,7 +39,7 @@ const TimerPublished = () => {
 
   return (
     <section className="w-1/2 rounded-lg border border-solid border-border p-4">
-      <h3 className=" text-xl font-bold">Timer Published</h3>
+      <h3 className="text-xl font-bold">Timer Published</h3>
 
       <List
         loading={loading}

@@ -305,3 +305,34 @@ export async function getPendingArticles(pageSize: number) {
 
   return IResponse.Success(pendingArticles);
 }
+
+export async function getArticleStatusCount() {
+  try {
+    const count = await prisma.article.count({
+      where: {
+        status: ArticleStatus.PUBLISHED,
+      },
+    });
+
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const prevCount = await prisma.article.count({
+      where: {
+        status: ArticleStatus.PUBLISHED,
+        updatedAt: {
+          gte: new Date(yesterday.setHours(0, 0, 0, 0)),
+          lt: new Date(today.setHours(0, 0, 0, 0)),
+        },
+      },
+    });
+    return IResponse.Success({
+      total: count,
+      yesterday: prevCount,
+      increase: count - prevCount,
+    });
+  } catch (err) {
+    return IResponse.Error(500, "Internal Server Error");
+  }
+}

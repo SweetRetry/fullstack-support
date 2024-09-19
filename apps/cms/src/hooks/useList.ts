@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { ResponseData } from "@repo/database/types/response";
 import { debounce } from "lodash-es";
 
@@ -70,9 +70,9 @@ export const useList = <T, P extends Record<string, any> = Record<string, any>>(
         totalCount: 0,
       }
     );
-  }, [service, options]);
+  }, [service, options, params.current]);
 
-  const debounceFetch = debounce(async () => await fetch(), 200);
+  const debounceFetch = debounce(() => fetch(), 200);
 
   const nextPage = () => {
     // 检查可否下一页
