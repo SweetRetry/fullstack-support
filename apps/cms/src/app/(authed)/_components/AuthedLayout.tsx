@@ -43,7 +43,7 @@ const AuthedLayout = ({ children }: { children: React.ReactNode }) => {
             name={menus.find((item) => item.href === `/${activePath}`)?.name}
           />
 
-          <main className="mt-16 flex flex-1 flex-col px-8">
+          <main className="mt-16 flex flex-1 flex-col px-8 h-full">
             <section className="flex-grow">{children}</section>
             <SiteFooter />
           </main>

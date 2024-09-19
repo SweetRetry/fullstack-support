@@ -11,10 +11,11 @@ import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import RoleEditModal from "./_components/RoleEditModal";
 import CreateUserModal from "./_components/CreateUserModal";
+import { checkAuth } from "../_components/AuthProvider";
 const page = () => {
   const [emailLike, setEmailLike] = useState("");
 
-  const { fetch, data, totalCount, totalPage, loading ,setData} = useList(
+  const { fetch, data, totalCount, totalPage, loading } = useList(
     {
       emailLike,
     },
@@ -52,42 +53,12 @@ const page = () => {
           placeholder="Search user by email"
         />
 
-        <div className="flex gap-2">
-          {/* <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline">
-                <FilterIcon width={20} height={20} className="mr-1" />
-                <span> Filter</span>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="z-10 bg-background shadow">
-              <DropdownMenuItem
-                onClick={() => {
-                  setStatus(undefined);
-                  fetch();
-                }}
-              >
-                All
-              </DropdownMenuItem>
-              {Object.values(ArticleStatus).map((item) => (
-                <DropdownMenuItem
-                  key={item}
-                  onClick={() => {
-                    setStatus(item);
-                    fetch();
-                  }}
-                >
-                  {item}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu> */}
-
+        {checkAuth("user:create") && (
           <Button onClick={() => setCreateUserModalOpen(true)}>
             <Plus className="mr-1" width={20} height={20} />
             <span>Add Users</span>
           </Button>
-        </div>
+        )}
       </div>
       <DataTable
         data={data}
@@ -106,7 +77,7 @@ const page = () => {
       <CreateUserModal
         open={createUserModalOpen}
         setOpen={setCreateUserModalOpen}
-
+        onSuccess={fetch}
       />
     </div>
   );

@@ -26,7 +26,7 @@ cron.schedule("* * * * *", async () => {
       const publishedTime = await RedisClient.get(
         `pending:artcile:${article.id}`
       );
-      console.log(publishedTime, dayjs(now).isAfter(dayjs(publishedTime)));
+
       // 如果当前时间已经超过publishedTime，则更新文章状态为已发布
       if (publishedTime && dayjs(now).isAfter(dayjs(publishedTime))) {
         shouldUpdatedList.push(article.id);

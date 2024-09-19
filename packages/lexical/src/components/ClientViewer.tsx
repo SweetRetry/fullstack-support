@@ -64,7 +64,7 @@ const Viewer = ({ content }: { content: string }) => {
 const ClientViewer = ({ article }: { article: Article }) => {
   return (
     <article>
-      <div className="py-2 ">
+      <div className="py-2">
         <div className="flex justify-between">
           <h3 className="text-xl font-bold">{article?.title}</h3>
           <p className="text-muted-foreground">

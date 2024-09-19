@@ -213,7 +213,9 @@ const ViewerToolBar = ({
       <Button
         size="icon"
         variant="ghost"
-        disabled={status === ArticleStatus.DELETED}
+        disabled={
+          !checkAuth("article:delete") || status === ArticleStatus.DELETED
+        }
         onClick={() => onDelete()}
       >
         <Trash />
@@ -224,7 +226,9 @@ const ViewerToolBar = ({
       <Button
         size="icon"
         variant="ghost"
-        disabled={status !== ArticleStatus.UNPUBLISHED}
+        disabled={
+          status !== ArticleStatus.UNPUBLISHED || !checkAuth("article:publish")
+        }
         onClick={() => setOpen(true)}
       >
         <Timer />
@@ -233,7 +237,9 @@ const ViewerToolBar = ({
       <Button
         size="icon"
         variant="ghost"
-        disabled={status !== ArticleStatus.PUBLISHED}
+        disabled={
+          status !== ArticleStatus.PUBLISHED || !checkAuth("article:publish")
+        }
         onClick={() => onRevert()}
       >
         <CornerUpLeft />
@@ -242,7 +248,9 @@ const ViewerToolBar = ({
       <Button
         size="icon"
         variant="ghost"
-        disabled={status !== ArticleStatus.UNPUBLISHED}
+        disabled={
+          status !== ArticleStatus.UNPUBLISHED || !checkAuth("article:publish")
+        }
         onClick={() => onPublish()}
       >
         <CornerUpRight />
@@ -251,7 +259,9 @@ const ViewerToolBar = ({
       <Button
         size="icon"
         variant="ghost"
-        disabled={status !== ArticleStatus.UNDER_REVIEW}
+        disabled={
+          status !== ArticleStatus.UNDER_REVIEW || !checkAuth("article:review")
+        }
         onClick={() => onReview()}
       >
         <Check />

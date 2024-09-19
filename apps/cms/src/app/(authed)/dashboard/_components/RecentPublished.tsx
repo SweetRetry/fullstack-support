@@ -1,14 +1,12 @@
 "use client";
 import ArticleViewer from "@/components/ArticleViewer";
-import { LoadingSpinner } from "@/components/LoadingSpinner";
+
 import { Modal } from "@/components/ui-extends/Modal";
 
 import { useList } from "@/hooks/useList";
 import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 import { ArticleStatus } from "@prisma/client";
 import { getArticleList } from "@repo/database/services/article";
-import { ArrowRight } from "lucide-react";
-import Link from "next/link";
 
 import React, { useEffect, useState } from "react";
 import { List } from "antd";

@@ -1,12 +1,14 @@
 "use server";
+import { hash } from "crypto";
 import { prisma, Role } from "../client";
 import { IResponse } from "../utils/responseUtil";
 import { TokenUtil } from "../utils/tokenUtil";
 
 export async function login(data: { email: string; password: string }) {
   if (!data.email || !data.password) return IResponse.Error(400, "参数错误");
+  const hashedPassword = hash("sha256", data.password);
   const user = await prisma.user.findUnique({
-    where: { email: data.email, password: data.password },
+    where: { email: data.email, password: hashedPassword },
   });
   if (user) {
     // 生成 JWT
@@ -77,10 +79,11 @@ export const postCreateUser = async (params: {
   roleId: string;
 }) => {
   try {
+    const hashedPassword = hash("sha256", params.password);
     const newUser = await prisma.user.create({
       data: {
         email: params.email,
-        password: params.password,
+        password: hashedPassword,
         role: {
           connect: {
             id: params.roleId,

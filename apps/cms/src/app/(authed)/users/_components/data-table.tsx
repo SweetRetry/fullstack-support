@@ -95,7 +95,7 @@ export function DataTable<TData, TValue>({
       {totalPage > 1 && (
         <div className="flex items-center justify-end space-x-2">
           <span>
-            Total {totalCount} articles , {totalPage} pages
+            Total {totalCount} users , {totalPage} pages
           </span>
           <Button
             variant="outline"
