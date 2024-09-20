@@ -3,6 +3,7 @@ import { hash } from "crypto";
 import { prisma, Role } from "../client";
 import { IResponse } from "../utils/responseUtil";
 import { TokenUtil } from "../utils/tokenUtil";
+import { PermissionUtil } from "../utils/authUtil";
 
 export async function login(data: { email: string; password: string }) {
   if (!data.email || !data.password) return IResponse.Error(400, "参数错误");
@@ -73,12 +74,19 @@ export const getUserList = async (params: {
   }
 };
 
-export const postCreateUser = async (params: {
-  email: string;
-  password: string;
-  roleId: string;
-}) => {
+export const postCreateUser = async (
+  params: {
+    email: string;
+    password: string;
+    roleId: string;
+  },
+  token: string
+) => {
   try {
+    const hasPermission = PermissionUtil.checkPermission(token, "user:create");
+    if (!hasPermission) {
+      return IResponse.PermissionDenied();
+    }
     const hashedPassword = hash("sha256", params.password);
     const newUser = await prisma.user.create({
       data: {

@@ -5,7 +5,6 @@ import { z } from "zod";
 import { IResponse } from "../utils/responseUtil";
 import { StatusCodes } from "http-status-codes";
 import Redis from "@repo/redis";
-import RedisClient from "@repo/redis";
 export async function getArticle(id: string) {
   try {
     const article = await prisma.article.findUnique({
@@ -50,7 +49,7 @@ export async function getArticleList(params: {
             },
           ]
         : undefined,
-      status: params.status ?? { not: ArticleStatus.DELETED },
+      status: params.status,
       categoryId: params.categoryId,
     };
     const listFn = prisma.article.findMany({
@@ -71,7 +70,19 @@ export async function getArticleList(params: {
       where: wherePattern,
     });
 
-    const [list, totalCount] = await Promise.all([listFn, totalCountFn]);
+    let [list, totalCount] = await Promise.all([listFn, totalCountFn]);
+
+    list = await Promise.all(
+      list.map(async (item) => {
+        if (item.status === ArticleStatus.PENDING) {
+          return {
+            ...item,
+            publishedAt: await Redis.get(`pending:article:${item.id}`),
+          };
+        }
+        return item;
+      })
+    );
 
     return IResponse.Success<{
       list: Array<{
@@ -80,6 +91,7 @@ export async function getArticleList(params: {
         status: ArticleStatus;
         updatedAt: Date;
         description: string;
+        publishedAt?: string;
         category: { id: string; name: string } | null;
       }>;
       totalPage: number;
@@ -259,7 +271,7 @@ export async function postPulishArticle(
           status: ArticleStatus.PENDING,
         },
       });
-      Redis.set(`pending:artcile:${data.id}`, data.expiredAt);
+      Redis.set(`pending:article:${data.id}`, data.expiredAt);
       return IResponse.Success(pendingArticle);
     }
   } catch (err) {
@@ -289,7 +301,7 @@ export async function postPulishArticle(
 }
 
 export async function getPendingArticles(pageSize: number) {
-  const keys = await RedisClient.keys("pending:artcile:*");
+  const keys = await Redis.keys("pending:article:*");
 
   if (!keys.length) return;
 

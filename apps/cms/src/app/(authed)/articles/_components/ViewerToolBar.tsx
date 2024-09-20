@@ -179,14 +179,17 @@ const ViewerToolBar = ({
   };
   const onFuturePublish = async () => {
     if (expiredAt) {
-      postPulishArticle(
+      const res = await postPulishArticle(
         { id, type: "future", expiredAt: formatToUtcTime(expiredAt) },
         getToken(),
       );
-      toast({
-        title: "Timed Publish Success",
-        description: `Your article will be published at ${expiredAt.toString()}.`,
-      });
+      if (res.data?.id) {
+        toast({
+          title: "Timed Publish Success",
+          description: `Your article will be published at ${expiredAt.toString()}.`,
+        });
+        setOpen(false);
+      }
     }
   };
 

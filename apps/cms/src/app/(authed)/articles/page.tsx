@@ -19,6 +19,7 @@ import ViewerToolBar from "./_components/ViewerToolBar";
 import { Empty } from "antd";
 import Link from "next/link";
 import FilterModalContent from "./_components/FilterModalContent";
+import dayjs from "dayjs";
 
 const page = () => {
   const [keyword, setKeyword] = useState("");
@@ -27,7 +28,7 @@ const page = () => {
 
   const [filterModalOpen, setFilterModalOpen] = useState(false);
 
-  const { fetch, data, setData, loading, debounceFetch, params } = useList(
+  const { fetch, data, setData, loading, debounceFetch } = useList(
     { keyword, status, categoryId },
     getArticleList,
   );
@@ -36,25 +37,20 @@ const page = () => {
 
   const actionArticleItem = data.find((item) => item.id === actionItemId);
 
-  useEffect(() => {
-    async function run() {
-      const res = await fetch();
+  async function wrapFetch() {
+    const res = await fetch();
 
-      if (res?.list.length) {
-        setActionItemId(res.list[0].id);
-      }
+    if (res?.list.length) {
+      setActionItemId(res.list[0].id);
     }
+  }
 
-    run();
-
+  useEffect(() => {
     document.title = "Articles";
   }, []);
 
-  // 监视状态变化来触发 fetch
   useEffect(() => {
-    if (status !== undefined || categoryId !== undefined) {
-      fetch();
-    }
+    wrapFetch();
   }, [status, categoryId]);
 
   return (
@@ -116,6 +112,12 @@ const page = () => {
                     )}
                   >
                     {item.status}
+                    {item.status === ArticleStatus.PENDING && (
+                      <span>
+                        {" - "}{" "}
+                        {dayjs(item.publishedAt).format("YYYY-MM-DD HH:mm:ss")}
+                      </span>
+                    )}
                   </span>
                 </div>
               </li>
