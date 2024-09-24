@@ -17,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { getToken } from "@/lib/tokenUtil";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Role } from "@prisma/client";
 import { getRoleList } from "@repo/database/services/role";
@@ -53,7 +54,7 @@ const CreateUserModal = ({
     const success = await form.trigger();
     if (!success) return;
     setLoading(true);
-    const res = await postCreateUser(values);
+    const res = await postCreateUser(values, getToken());
     if (res.data?.id) {
       setOpen(false);
       onSuccess();
@@ -67,10 +68,10 @@ const CreateUserModal = ({
   useEffect(() => {
     async function run() {
       if (cacheRoles.current) return;
-      const res = await getRoleList();
+      const res = await getRoleList(getToken());
       if (res.code === 200 && res.data) {
-        setRoles(res.data);
-        cacheRoles.current = res.data;
+        setRoles(res.data.list);
+        cacheRoles.current = res.data.list;
       }
     }
 

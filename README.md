@@ -27,7 +27,7 @@
 ### Dashboard
 
 - [x] Display recent publishing articles
-- [ ] Display article variant info
+- [x] Display article variant info
 
 ### article
 
@@ -36,8 +36,8 @@
 - [x] Save
 - [x] Publish
 - [x] Fake Delete
-- [ ] Revert publish
-- [ ] Under Review
+- [x] Revert publish
+- [x] Under Review
 
 ### editor
 
@@ -51,7 +51,7 @@
 
 - [x] Display user list
 - [ ] Edit user role
-- [ ] Create user
+- [x] Create user
 - [ ] Delete user
 - [ ] Edit role permission
 - [ ] Reset password

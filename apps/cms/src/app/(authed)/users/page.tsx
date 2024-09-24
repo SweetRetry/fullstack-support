@@ -3,13 +3,13 @@ import { useList } from "@/hooks/useList";
 import React, { useEffect, useState } from "react";
 import { getUserList, UserListItem } from "@repo/database/services/user";
 import { useColumns } from "./_components/columns";
-import { DataTable } from "./_components/data-table";
+import { DataTable } from "@/components/ui-extends/data-table";
 
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 import { Plus } from "lucide-react";
-import RoleEditModal from "./_components/RoleEditModal";
+import RoleCheckModal from "./_components/RoleCheckModal";
 import CreateUserModal from "./_components/CreateUserModal";
 import { checkAuth } from "../_components/AuthProvider";
 const page = () => {
@@ -22,13 +22,13 @@ const page = () => {
     getUserList,
   );
 
-  const [actionItem, setActionitem] = useState<UserListItem>();
+  const [actionRoleId, setActionRoleId] = useState<string | undefined>();
   const [open, setOpen] = useState(false);
 
   const [createUserModalOpen, setCreateUserModalOpen] = useState(false);
 
-  const onEdit = (item: UserListItem) => {
-    setActionitem(item);
+  const onEdit = (roleId?: string) => {
+    setActionRoleId(roleId);
     setOpen(true);
   };
 
@@ -61,18 +61,15 @@ const page = () => {
         )}
       </div>
       <DataTable
+        mark="users"
         data={data}
         loading={loading}
         totalCount={totalCount}
         totalPage={totalPage}
         columns={columns}
       />
-      {actionItem?.role && (
-        <RoleEditModal
-          open={open}
-          setOpen={setOpen}
-          roleId={actionItem?.role?.id}
-        />
+      {actionRoleId && (
+        <RoleCheckModal open={open} setOpen={setOpen} roleId={actionRoleId} />
       )}
       <CreateUserModal
         open={createUserModalOpen}

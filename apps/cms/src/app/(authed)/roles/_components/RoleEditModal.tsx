@@ -1,6 +1,8 @@
+import ButtonLoading from "@/components/ui-extends/ButtonLoading";
 import { Modal } from "@/components/ui-extends/Modal";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
+import { useToast } from "@/hooks/use-toast";
 import {
   getRolePermissionsById,
   putRolePermissionsUpdate,
@@ -28,11 +30,16 @@ const RoleEditModal = ({
     >
   >();
 
-  const initPermissions = useRef<string[]>();
+  const [loading, setLoading] = useState(false);
+
+  const initialPermissions = useRef<string[]>();
+
+  const { toast } = useToast();
 
   const onConfirm = async () => {
-    if (!initPermissions.current) return;
+    if (!initialPermissions.current) return;
     if (!permissionGroup) return;
+    setLoading(true);
     const changedPermissionIds = Object.values(permissionGroup)
       .flat()
       .filter((item) => item.isChecked)
@@ -45,7 +52,12 @@ const RoleEditModal = ({
 
     if (res.code === 200 && res.data) {
       setOpen(false);
+      toast({
+        title: "Success",
+        description: "Update permission successfully",
+      });
     }
+    setLoading(false);
   };
 
   useEffect(() => {
@@ -62,7 +74,7 @@ const RoleEditModal = ({
           }[]
         > = {};
 
-        initPermissions.current = res.data
+        initialPermissions.current = res.data
           .filter((item) => item.isChecked)
           .map((item) => item.id);
 
@@ -121,7 +133,10 @@ const RoleEditModal = ({
           <Button variant="secondary" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button onClick={() => onConfirm()}>Confirm</Button>
+
+          <ButtonLoading loading={loading} onClick={() => onConfirm()}>
+            Confirm
+          </ButtonLoading>
         </div>
       </div>
     </Modal>

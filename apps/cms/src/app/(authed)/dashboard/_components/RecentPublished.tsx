@@ -26,7 +26,7 @@ const RecentPublished = () => {
   }, []);
 
   return (
-    <section className="w-1/2 rounded-lg border border-solid border-border p-4">
+    <section className="rounded-lg border border-solid border-border p-4 flex-1">
       <h3 className="text-xl font-bold">Recently Published</h3>
 
       <List
@@ -34,12 +34,18 @@ const RecentPublished = () => {
         dataSource={data}
         renderItem={(item) => (
           <List.Item
+            className="cursor-pointer hover:bg-muted"
             onClick={() => {
               setOpen(true);
               setActionItem(item);
             }}
           >
-            <List.Item.Meta title={item.title} description={item.description} />
+            <List.Item.Meta
+              title={<span className="text-foreground">{item.title}</span>}
+              description={
+                <span className="text-foreground">{item.description}</span>
+              }
+            />
 
             <div className="text-muted-foreground">
               {formatToUtcTime(item.updatedAt)}

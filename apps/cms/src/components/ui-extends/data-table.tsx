@@ -25,6 +25,7 @@ interface DataTableProps<TData, TValue> {
   totalCount: number;
   totalPage: number;
   loading: boolean;
+  mark: string;
 }
 
 export function DataTable<TData, TValue>({
@@ -33,6 +34,7 @@ export function DataTable<TData, TValue>({
   totalCount,
   totalPage,
   loading,
+  mark,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
@@ -42,23 +44,21 @@ export function DataTable<TData, TValue>({
   });
 
   return (
-    <div className="rounded-md">
+    <div>
       <Table>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                );
-              })}
+              {headerGroup.headers.map((header) => (
+                <TableHead key={header.id}>
+                  {header.isPlaceholder
+                    ? null
+                    : flexRender(
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
+                </TableHead>
+              ))}
             </TableRow>
           ))}
         </TableHeader>
@@ -95,7 +95,7 @@ export function DataTable<TData, TValue>({
       {totalPage > 1 && (
         <div className="flex items-center justify-end space-x-2">
           <span>
-            Total {totalCount} users , {totalPage} pages
+            Total {totalCount} {mark} , {totalPage} pages
           </span>
           <Button
             variant="outline"

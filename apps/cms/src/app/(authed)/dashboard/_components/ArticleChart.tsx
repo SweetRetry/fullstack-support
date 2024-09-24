@@ -58,7 +58,7 @@ const ArticleChart = () => {
     <div className="border border-border p-4 w-fit">
       <div
         id="article-pie-chart"
-        style={{ width: 700, height: 400 }}
+        style={{ width: 650, height: 400 }}
         className="w-full"
       ></div>
     </div>

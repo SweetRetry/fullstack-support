@@ -105,3 +105,22 @@ export const postCreateUser = async (
     return IResponse.Error(500, "Internal Server Error");
   }
 };
+
+export const getUserInfo = async (token: string) => {
+  try {
+    const userId = TokenUtil.verifyToken(token)?.userId;
+    if (!userId) return IResponse.PermissionDenied();
+    const user = await prisma.user.findUnique({
+      where: {
+        id: userId,
+      },
+      select: {
+        id: true,
+        email: true,
+      },
+    });
+    return IResponse.Success(user);
+  } catch (err) {
+    return IResponse.Error(500, "Internal Server Error");
+  }
+};

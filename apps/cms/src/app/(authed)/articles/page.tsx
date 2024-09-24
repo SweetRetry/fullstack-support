@@ -113,10 +113,7 @@ const page = () => {
                   >
                     {item.status}
                     {item.status === ArticleStatus.PENDING && (
-                      <span>
-                        {" - "}{" "}
-                        {dayjs(item.publishedAt).format("YYYY-MM-DD HH:mm:ss")}
-                      </span>
+                      <span>{` - ${formatToUtcTime(item.publishedAt!)}`}</span>
                     )}
                   </span>
                 </div>

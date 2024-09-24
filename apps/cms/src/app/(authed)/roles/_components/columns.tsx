@@ -4,24 +4,23 @@ import { Button } from "@/components/ui/button";
 
 import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 
-import { UserListItem } from "@repo/database/services/user";
 import { ColumnDef } from "@tanstack/react-table";
+
+import { Edit } from "lucide-react";
+import { Role } from "@prisma/client";
 
 export const useColumns = ({
   onEdit,
+  onDelete,
 }: {
-  onEdit: (roleId?: string) => void;
+  onEdit: (roleId: string) => void;
+  onDelete: (roleId: string) => void;
 }) => {
-  const columns: ColumnDef<UserListItem>[] = [
+  const columns: ColumnDef<Role>[] = [
     {
-      accessorKey: "email",
-      header: "Email",
-      cell: ({ row }) => <div>{row.getValue("email")}</div>,
-    },
-    {
-      accessorKey: "role",
+      accessorKey: "name",
       header: "Role",
-      cell: ({ row }) => <div>{row.original.role?.description}</div>,
+      cell: ({ row }) => <div>{row.getValue("name")}</div>,
     },
     {
       accessorKey: "createdAt",
@@ -30,7 +29,6 @@ export const useColumns = ({
         <div>{formatToUtcTime(row.getValue("createdAt"))}</div>
       ),
     },
-    // 所属目录
     {
       accessorKey: "updatedAt",
       header: "Updated at",
@@ -38,15 +36,24 @@ export const useColumns = ({
         <div>{formatToUtcTime(row.getValue("updatedAt"))}</div>
       ),
     },
-
     {
       accessorKey: "actions",
       header: () => <div className="text-right">Actions</div>,
       cell: ({ row }) => (
-        <div className="text-right">
-          <Button variant="link" onClick={() => onEdit(row.original.role?.id)}>
-            <span>Check</span>
-          </Button>
+        <div className="space-x-2 text-right">
+          {row.original.editable ? (
+            <>
+              <Button variant="link" onClick={() => onEdit(row.original.id)}>
+                <span>Edit</span>
+              </Button>
+
+              <Button variant="ghost" onClick={() => onDelete(row.original.id)}>
+                <span className="text-red-500">Delete</span>
+              </Button>
+            </>
+          ) : (
+            <span> -- </span>
+          )}
         </div>
       ),
     },
