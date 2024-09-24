@@ -3,7 +3,7 @@ import React from "react";
 const SiteFooter = () => {
   return (
     <footer className=" flex h-16 items-center justify-center border-t border-solid border-border">
-      <p >Exworth© 2024</p>
+      <p >SweetRetry© 2024</p>
     </footer>
   );
 };
