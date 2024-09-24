@@ -8,7 +8,7 @@ import cron from "node-cron";
 cron.schedule("* * * * *", async () => {
   const now = formatToUtcTime(new Date());
 
-  const keys = await RedisClient.keys("pending:artcile:*");
+  const keys = await RedisClient.keys("pending:article:*");
 
   if (!keys.length) return;
 
@@ -24,7 +24,7 @@ cron.schedule("* * * * *", async () => {
   for (const article of pendingArticles) {
     if (article.status === ArticleStatus.PENDING) {
       const publishedTime = await RedisClient.get(
-        `pending:artcile:${article.id}`
+        `pending:article:${article.id}`
       );
 
       // 如果当前时间已经超过publishedTime，则更新文章状态为已发布

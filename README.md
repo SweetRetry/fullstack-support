@@ -1,8 +1,6 @@
 # Support Center
 
-## Article Viewer
-
-负责展示文章目录，文章搜索，文章内容展示
+## User Site
 
 ### Home
 
@@ -22,22 +20,33 @@
 - [x] Lexical viewer ssr
 - [x] Right related articles lists
 
-## Content Manage Platform
+## CMS
 
 ### Dashboard
 
 - [x] Display recent publishing articles
 - [x] Display article variant info
+- [x] Display timer published articles
 
 ### article
 
-- [ ] Article list
+- [x] Article list
+- [x] query
 - [x] Preview
 - [x] Save
 - [x] Publish
-- [x] Fake Delete
-- [x] Revert publish
+- [x] Logic Delete
+- [x] Revert
+- [x] Timer Release
 - [x] Under Review
+
+### category (futrure)
+
+- [ ] Category list
+- [ ] search category
+- [ ] Create category
+- [ ] Edit category name
+- [ ] Delete category
 
 ### editor
 
@@ -45,13 +54,19 @@
 - [x] Timed Releases plugin
 - [x] insert link plugin
 - [x] insert image plugin
-- [ ] Need insert video plugin?
+- [ ] (future) insert video plugin
 
-### user (role)
+### user
 
 - [x] Display user list
-- [ ] Edit user role
+- [x] Check user permissions
 - [x] Create user
-- [ ] Delete user
-- [ ] Edit role permission
+- [x] Edit role permission
 - [ ] Reset password
+
+### role
+
+- [x] Display role list
+- [x] Create role
+- [x] Delete role
+- [x] Edit role permissions

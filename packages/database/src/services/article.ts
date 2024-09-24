@@ -4,7 +4,8 @@ import { PermissionUtil } from "../utils/authUtil";
 import { z } from "zod";
 import { IResponse } from "../utils/responseUtil";
 import { StatusCodes } from "http-status-codes";
-import Redis from "@repo/redis";
+import RedisClient from "@repo/redis";
+
 export async function getArticle(id: string) {
   try {
     const article = await prisma.article.findUnique({
@@ -77,7 +78,7 @@ export async function getArticleList(params: {
         if (item.status === ArticleStatus.PENDING) {
           return {
             ...item,
-            publishedAt: await Redis.get(`pending:article:${item.id}`),
+            publishedAt: await RedisClient.get(`pending:article:${item.id}`),
           };
         }
         return item;
@@ -271,7 +272,7 @@ export async function postPulishArticle(
           status: ArticleStatus.PENDING,
         },
       });
-      Redis.set(`pending:article:${data.id}`, data.expiredAt);
+      RedisClient.set(`pending:article:${data.id}`, data.expiredAt);
       return IResponse.Success(pendingArticle);
     }
   } catch (err) {
@@ -301,8 +302,8 @@ export async function postPulishArticle(
 }
 
 export async function getPendingArticles(pageSize: number) {
-  const keys = await Redis.keys("pending:article:*");
-
+  const keys = await RedisClient.keys("pending:article:*");
+  console.log(keys);
   if (!keys.length) return;
 
   const pendingArticles = await prisma.article.findMany({

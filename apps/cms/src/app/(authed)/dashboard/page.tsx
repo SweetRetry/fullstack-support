@@ -6,14 +6,13 @@ import TimerPublished from "./_components/TimerPublished";
 import ArticleStatusCount from "./_components/ArticleStatusCount";
 const page = () => {
   return (
-    <main className="space-y-8 px-16">
+    <main className="space-y-8 px-16 py-4">
       <ArticleStatusCount />
       <div className="flex space-x-8">
         <ArticleChart />
         <RecentPublished />
-
-        {/* <TimerPublished /> */}
       </div>
+      <TimerPublished />
     </main>
   );
 };
