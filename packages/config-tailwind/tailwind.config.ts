@@ -7,9 +7,12 @@ const config: Omit<Config, "content"> = {
   theme: {
     container: {
       center: true,
-      padding: "2rem",
+      padding: "1rem",
       screens: {
-        "2xl": "1400px",
+        sm: "640px",
+        md: "768px",
+        lg: "1024px",
+        xl: "1200px",
       },
     },
     extend: {
@@ -67,11 +70,11 @@ const config: Omit<Config, "content"> = {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
       },
-    },
-    screens: {
-      mobile: { max: "767px" },
-      tablet: "768px",
-      pc: "1024px",
+      screens: {
+        mobile: { max: "767px" },
+        tablet: { min: "768px", max: "1023px" },
+        pc: "1024px",
+      },
     },
   },
   plugins: [require("tailwindcss-animate")],

@@ -1,20 +1,9 @@
 import SectionWrap from "@/components/SectionWrap";
 import SearchContainer from "../../components/SearchContainer";
-import {prisma} from "@repo/database";
 
-import Link from "next/link";
+import FaqCategories from "@/components/faq/FaqCategories";
 
 export default async function Home() {
-  const categories = await prisma.category.findMany({
-    where: {
-      articles: {
-        some: {
-          published: true,
-        },
-      },
-    },
-  });
-
   return (
     <main>
       <SectionWrap>
@@ -26,17 +15,7 @@ export default async function Home() {
       <SectionWrap>
         <h2 className="text-3xl font-semibold">FAQ Category</h2>
 
-        <div className="-mx-4 flex flex-wrap gap-y-4">
-          {categories.map((category) => (
-            <div key={category.id} className="basis-1/3 px-4">
-              <div className="cursor-pointer rounded bg-muted px-4 py-2 text-muted-foreground">
-                <Link href={`/faq/${category.id}`}>
-                  <h3 className="text-foreground">{category.name}</h3>
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
+        <FaqCategories />
       </SectionWrap>
     </main>
   );

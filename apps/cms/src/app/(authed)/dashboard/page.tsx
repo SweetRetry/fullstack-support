@@ -1,32 +1,20 @@
 "use client";
-import React, { useEffect, useState } from "react";
-import { getArticleStatics } from "@repo/database/services/article";
-import { useToast } from "@/components/ui/use-toast";
-import { gsap } from "gsap";
-
-import { TextPlugin } from "gsap/TextPlugin";
-
-gsap.registerPlugin(TextPlugin);
+import React from "react";
+import RecentPublished from "./_components/RecentPublished";
+import ArticleChart from "./_components/ArticleChart";
+import TimerPublished from "./_components/TimerPublished";
+import ArticleStatusCount from "./_components/ArticleStatusCount";
 const page = () => {
-  const [count, setCount] = useState(0);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    async function run() {
-      const res = await getArticleStatics();
-      if (res.data?.count) {
-        setCount(res.data.count);
-      } else {
-        toast({
-          title: "获取文章数量失败",
-          description: res.message,
-        });
-      }
-    }
-    run();
-  });
-
-  return <div id="count">{count}</div>;
+  return (
+    <main className="space-y-8 px-16 py-4">
+      <ArticleStatusCount />
+      <div className="flex space-x-8">
+        <ArticleChart />
+        <RecentPublished />
+      </div>
+      <TimerPublished />
+    </main>
+  );
 };
 
 export default page;

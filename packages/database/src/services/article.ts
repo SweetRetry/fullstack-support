@@ -1,22 +1,351 @@
 "use server";
-import { prisma } from "../client";
-import { IResponse } from "../utils/response";
+import { prisma, Article, ArticleStatus } from "../client";
+import { PermissionUtil } from "../utils/authUtil";
+import { z } from "zod";
+import { IResponse } from "../utils/responseUtil";
+import { StatusCodes } from "http-status-codes";
+import RedisClient from "@repo/redis";
 
-// 统计articles数量
-export async function getArticleStatics() {
+export async function getArticle(id: string) {
   try {
-    const count = await prisma.article.count({
+    const article = await prisma.article.findUnique({
       where: {
-        published: true,
+        id,
+      },
+    });
+    return IResponse.Success<Article | null>(article);
+  } catch (err) {
+    return IResponse.Error(StatusCodes.INTERNAL_SERVER_ERROR, "服务器错误");
+  }
+}
+
+export interface ArticleListItem {
+  id: string;
+  title: string;
+  status: ArticleStatus;
+  updatedAt: Date;
+  description: string;
+  category: { id: string; name: string } | null;
+}
+export async function getArticleList(params: {
+  pageId: number;
+  pageSize: number;
+  status?: ArticleStatus;
+  keyword?: string;
+  categoryId?: string;
+}) {
+  try {
+    const wherePattern = {
+      OR: params.keyword
+        ? [
+            {
+              title: {
+                contains: params.keyword,
+              },
+            },
+            {
+              description: {
+                contains: params.keyword,
+              },
+            },
+          ]
+        : undefined,
+      status: params.status,
+      categoryId: params.categoryId,
+    };
+    const listFn = prisma.article.findMany({
+      take: params.pageSize,
+      skip: (params.pageId - 1) * params.pageSize,
+      where: wherePattern,
+      select: {
+        id: true,
+        title: true,
+        status: true,
+        updatedAt: true,
+        description: true,
+        category: true,
       },
     });
 
+    const totalCountFn = prisma.article.count({
+      where: wherePattern,
+    });
+
+    let [list, totalCount] = await Promise.all([listFn, totalCountFn]);
+
+    list = await Promise.all(
+      list.map(async (item) => {
+        if (item.status === ArticleStatus.PENDING) {
+          return {
+            ...item,
+            publishedAt: await RedisClient.get(`pending:article:${item.id}`),
+          };
+        }
+        return item;
+      })
+    );
+
     return IResponse.Success<{
-      count: number;
+      list: Array<{
+        id: string;
+        title: string;
+        status: ArticleStatus;
+        updatedAt: Date;
+        description: string;
+        publishedAt?: string;
+        category: { id: string; name: string } | null;
+      }>;
+      totalPage: number;
+      totalCount: number;
     }>({
-      count,
+      list,
+      totalPage: Math.ceil(totalCount / params.pageSize),
+      totalCount,
     });
   } catch (err) {
+    return IResponse.FakeSuccess(
+      {
+        list: [],
+        totalPage: 0,
+        totalCount: 0,
+      },
+      500,
+      "Internal Server Error"
+    );
+  }
+}
+
+export async function deleteArticle(data: { id: string }, token: string) {
+  try {
+    const hasPermission = await PermissionUtil.checkPermission(
+      token,
+      "article:delete"
+    );
+    if (!hasPermission) {
+      return IResponse.PermissionDenied();
+    }
+    const deletedArticle = await prisma.article.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        status: ArticleStatus.DELETED,
+      },
+    });
+
+    return IResponse.Success<string>(deletedArticle.id, "删除成功");
+  } catch (err) {
     return IResponse.Error(500, "服务器错误");
+  }
+}
+
+export async function postSaveActical(
+  data: {
+    title: string;
+    content: string;
+    description: string;
+  },
+  token: string
+) {
+  try {
+    const hasPermission = await PermissionUtil.checkPermission(
+      token,
+      "article:edit"
+    );
+
+    if (!hasPermission) {
+      return IResponse.PermissionDenied();
+    }
+
+    const schema = z.object({
+      title: z.string().min(1),
+      content: z.string().min(1),
+      description: z.string(),
+    });
+
+    const { success } = schema.safeParse(data);
+    if (!success) {
+      return IResponse.Error(500, "params error");
+    }
+
+    const newArticle = await prisma.article.create({
+      data,
+    });
+
+    return IResponse.Success<Article>(newArticle);
+  } catch (err) {
+    return IResponse.Error(500, "服务器错误");
+  }
+}
+
+export async function putUpdateArticle(
+  data: Partial<Article> & {
+    id: string;
+  },
+  token: string
+) {
+  try {
+    const hasPermission = await PermissionUtil.checkPermission(
+      token,
+      "article:edit"
+    );
+
+    if (!hasPermission) {
+      return IResponse.PermissionDenied();
+    }
+
+    const updatedArticle = await prisma.article.update({
+      where: {
+        id: data.id,
+      },
+      data,
+    });
+
+    return IResponse.Success<Article>(updatedArticle);
+  } catch (err) {
+    return IResponse.Error(500, "服务器错误");
+  }
+}
+
+export async function getArticleListByKeyword(keyword: string) {
+  try {
+    const articles = await prisma.article.findMany({
+      where: {
+        OR: [
+          {
+            title: {
+              contains: keyword,
+            },
+          },
+          {
+            description: {
+              contains: keyword,
+            },
+          },
+        ],
+        status: ArticleStatus.PUBLISHED,
+      },
+      take: 10,
+      select: {
+        id: true,
+        title: true,
+        description: true,
+        updatedAt: true,
+        categoryId: true,
+        category: {
+          select: {
+            name: true,
+          },
+        },
+      },
+    });
+
+    return IResponse.Success(articles);
+  } catch (err) {
+    return IResponse.Error(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "Internal Server Error"
+    );
+  }
+}
+
+export async function postPulishArticle(
+  data: { id: string; type: "now" | "future"; expiredAt?: string },
+  token: string
+) {
+  const hasPermission = await PermissionUtil.checkPermission(
+    token,
+    "article:publish"
+  );
+
+  if (!hasPermission) {
+    return IResponse.PermissionDenied();
+  }
+
+  try {
+    if (data.type === "future" && data.expiredAt) {
+      const pendingArticle = await prisma.article.update({
+        where: {
+          id: data.id,
+        },
+        data: {
+          status: ArticleStatus.PENDING,
+        },
+      });
+      RedisClient.set(`pending:article:${data.id}`, data.expiredAt);
+      return IResponse.Success(pendingArticle);
+    }
+  } catch (err) {
+    return IResponse.Error(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "Interval server error"
+    );
+  }
+
+  try {
+    const published = await prisma.article.update({
+      where: {
+        id: data.id,
+      },
+      data: {
+        status: ArticleStatus.PUBLISHED,
+      },
+    });
+
+    return IResponse.Success(published);
+  } catch (err) {
+    return IResponse.Error(
+      StatusCodes.INTERNAL_SERVER_ERROR,
+      "Interval server error"
+    );
+  }
+}
+
+export async function getPendingArticles(pageSize: number) {
+  const keys = await RedisClient.keys("pending:article:*");
+  console.log(keys);
+  if (!keys.length) return;
+
+  const pendingArticles = await prisma.article.findMany({
+    where: {
+      id: {
+        in: keys.map((key) => key.split(":")[2]),
+      },
+      status: ArticleStatus.PENDING,
+    },
+    take: pageSize ?? 5,
+  });
+
+  return IResponse.Success(pendingArticles);
+}
+
+export async function getArticleStatusCount() {
+  try {
+    const count = await prisma.article.count({
+      where: {
+        status: ArticleStatus.PUBLISHED,
+      },
+    });
+
+    const today = new Date();
+    const yesterday = new Date();
+    yesterday.setDate(today.getDate() - 1);
+
+    const prevCount = await prisma.article.count({
+      where: {
+        status: ArticleStatus.PUBLISHED,
+        updatedAt: {
+          gte: new Date(yesterday.setHours(0, 0, 0, 0)),
+          lt: new Date(today.setHours(0, 0, 0, 0)),
+        },
+      },
+    });
+    return IResponse.Success({
+      total: count,
+      yesterday: prevCount,
+      increase: count - prevCount,
+    });
+  } catch (err) {
+    return IResponse.Error(500, "Internal Server Error");
   }
 }

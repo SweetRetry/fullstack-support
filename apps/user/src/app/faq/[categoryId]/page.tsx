@@ -8,13 +8,13 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import { Separator } from "@/components/ui/separator";
-import { formatToUtcTime } from "@/lib/dayjsExtend";
 
 import Link from "next/link";
 // import dynamic from "next/dynamic";
 import React from "react";
 import CategoryMenu from "../_components/CategoryMenu";
-import { prisma } from "@repo/database";
+import { getCategoryWithArticles } from "@repo/database/services/category";
+import { formatToUtcTime } from "@repo/utils/dayjsUtil";
 
 // const LocalTime = dynamic(() => import("@/components/LocalTime"), {
 //   ssr: false,
@@ -26,24 +26,7 @@ const page = async ({
     categoryId: string;
   };
 }) => {
-  const categroy = await prisma.category.findUnique({
-    where: {
-      id: params.categoryId,
-    },
-    include: {
-      articles: {
-        where: {
-          published: true,
-        },
-        select: {
-          id: true,
-          title: true,
-          publishedAt: true,
-          description: true,
-        },
-      },
-    },
-  });
+  const { data: category } = await getCategoryWithArticles(params.categoryId);
 
   return (
     <main className="flex">
@@ -61,12 +44,12 @@ const page = async ({
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{categroy?.name}</BreadcrumbPage>
+                <BreadcrumbPage>{category?.name}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
           <div className="space-y-4">
-            {categroy?.articles.map((article, index) => (
+            {category?.articles.map((article, index) => (
               <div key={article.id}>
                 <div className="mb-4 flex items-center justify-between">
                   <Link
@@ -78,14 +61,13 @@ const page = async ({
 
                   <span className="text-muted-foreground">
                     {/* {article.publishedAt && <LocalTime time={article.publishedAt} />} */}
-                    {article.publishedAt &&
-                      formatToUtcTime(article.publishedAt)}
+                    {article.updatedAt && formatToUtcTime(article.updatedAt)}
                   </span>
                 </div>
                 <p className="whitespace-pre-line text-muted-foreground">
                   {article.description}
                 </p>
-                {index !== categroy.articles.length - 1 && (
+                {index !== category.articles.length - 1 && (
                   <Separator className="my-4" />
                 )}
               </div>

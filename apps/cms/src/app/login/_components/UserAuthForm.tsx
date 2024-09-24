@@ -13,9 +13,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-import { login } from "@repo/database/services/auth";
+import { login } from "@repo/database/services/user";
 import { useRouter } from "next/navigation";
-import { useToast } from "@/components/ui/use-toast";
+
+import { setToken } from "@/lib/tokenUtil";
+import { useToast } from "@/hooks/use-toast";
 
 const formSchema = z.object({
   email: z.string().email().min(1, { message: "Email is required" }),
@@ -35,7 +37,7 @@ const UserAuthForm = () => {
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     const res = await login(values);
     if (res.data?.token) {
-      localStorage.setItem("token", JSON.stringify(res.data?.token));
+      setToken(res.data.token);
       router.push("/dashboard");
     } else {
       toast({
@@ -46,8 +48,8 @@ const UserAuthForm = () => {
   };
   return (
     <section>
-      <h2 className="font-bold text-2xl">Login</h2>
-      <p className="text-sm text-muted-foreground mt-2 mb-4">
+      <h2 className="text-2xl font-bold">Login</h2>
+      <p className="mb-4 mt-2 text-sm text-muted-foreground">
         Enter your email below to login to your account
       </p>
       <Form {...form}>
@@ -80,7 +82,9 @@ const UserAuthForm = () => {
             )}
           />
 
-          <Button className="block w-full">Login</Button>
+          <Button className="block w-full" type="submit">
+            Login
+          </Button>
         </form>
       </Form>
     </section>

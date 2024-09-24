@@ -1,4 +1,4 @@
-import {prisma} from "@repo/database";
+import { ArticleStatus, prisma } from "@repo/database";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import React from "react";
@@ -7,7 +7,7 @@ const getPosts = async (categoryId: string) => {
   const data = await prisma.article.findMany({
     where: {
       categoryId,
-      published: true,
+      status: ArticleStatus.PUBLISHED,
     },
     select: {
       id: true,
@@ -27,7 +27,7 @@ const RealtedArticles = async ({
   if (!categoryId) return null;
   const relatedPosts = await getPosts(categoryId);
   return (
-    <aside className="w-[280px] min-w-[280px] mobile:hidden ml-4">
+    <aside className="ml-4 w-[280px] min-w-[280px] mobile:hidden">
       <h3 className="mb-4 text-2xl font-bold">Related Articles</h3>
       <nav className="space-y-4">
         {relatedPosts.map((item) => (

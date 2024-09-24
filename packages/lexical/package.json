@@ -1,0 +1,33 @@
+{
+  "name": "@repo/lexical",
+  "version": "1.0.0",
+  "exports": {
+    "./components/*": "./src/components/*.tsx",
+    "./config/*": "./src/config/*.ts",
+    "./utils/*": "./src/utils/*.ts",
+    "./nodes/*": "./src/nodes/*.tsx"
+  },
+  "dependencies": {
+    "@lexical/code": "^0.17.0",
+    "@lexical/headless": "^0.17.0",
+    "@lexical/html": "^0.17.0",
+    "@lexical/link": "^0.17.0",
+    "@lexical/list": "^0.17.0",
+    "@lexical/react": "^0.17.0",
+    "@lexical/rich-text": "^0.17.0",
+    "@lexical/selection": "^0.17.0",
+    "@lexical/utils": "^0.17.0",
+    "@repo/utils": "workspace:*",
+    "@types/jsdom": "^21.1.7",
+    "jsdom": "^24.1.1",
+    "lexical": "^0.17.0",
+    "react": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*",
+    "@types/react": "^18",
+    "@types/react-dom": "^18"
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "name": "@repo/utils",
+  "version": "1.0.0",
+  "exports": {
+    "./*": "./src/*.ts"
+  },
+  "dependencies": {
+    "dayjs": "^1.11.12"
+  },
+  "devDependencies": {
+    "@repo/eslint-config": "workspace:*",
+    "@repo/typescript-config": "workspace:*"
+  }
+}

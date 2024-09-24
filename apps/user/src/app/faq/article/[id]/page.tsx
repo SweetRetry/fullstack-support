@@ -1,7 +1,5 @@
 import { prisma } from "@repo/database";
 
-import { getHtml } from "@/lib/lexicalUtil";
-
 import CategoryMenu from "../../_components/CategoryMenu";
 import {
   Breadcrumb,
@@ -11,8 +9,10 @@ import {
   BreadcrumbSeparator,
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
-import { formatToUtcTime } from "@/lib/dayjsExtend";
+
 import RealtedArticles from "./_components/RealtedArticles";
+
+import Viewer from "@repo/lexical/components/Viewer";
 
 export async function generateMetadata({ params }: { params: { id: string } }) {
   const data = await prisma.article.findUnique({
@@ -24,8 +24,9 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
       title: true,
       content: true,
       categoryId: true,
-      Category: true,
-      publishedAt: true,
+      category: true,
+      updatedAt: true,
+      description: true,
     },
   });
 
@@ -34,21 +35,20 @@ export async function generateMetadata({ params }: { params: { id: string } }) {
     data,
   };
 }
-const getPost = async (id: string) => {
+const getArticle = async (id: string) => {
   const { data } = await generateMetadata({ params: { id } });
+
   return data;
 };
 
 const page = async ({ params }: { params: { id: string } }) => {
-  const post = await getPost(params.id);
+  const article = await getArticle(params.id);
 
-  if (!post?.id) return;
-
-  const html = await getHtml(post.content as string);
+  if (!article?.id) return;
 
   return (
     <main className="mt-6 flex">
-      {post.categoryId && <CategoryMenu categoryId={post.categoryId} />}
+      {article.categoryId && <CategoryMenu categoryId={article.categoryId} />}
       <section className="flex flex-1 px-8">
         <main className="flex-grow">
           <Breadcrumb>
@@ -62,31 +62,22 @@ const page = async ({ params }: { params: { id: string } }) => {
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbLink href={`/support/faq/${post.categoryId}`}>
-                  {post.Category?.name}
+                <BreadcrumbLink href={`/support/faq/${article.categoryId}`}>
+                  {article.category?.name}
                 </BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator />
               <BreadcrumbItem>
-                <BreadcrumbPage>{post?.title}</BreadcrumbPage>
+                <BreadcrumbPage>{article?.title}</BreadcrumbPage>
               </BreadcrumbItem>
             </BreadcrumbList>
           </Breadcrumb>
-          <div className="mt-8">
-            <h2 className="text-2xl font-bold">{post?.title}</h2>
-            <p className="mt-2 text-muted-foreground">
-              {post.publishedAt && formatToUtcTime(post.publishedAt)}
-            </p>
-            <article
-              dangerouslySetInnerHTML={{ __html: html }}
-              className="mt-8"
-            />
-          </div>
+          <Viewer article={article} />
         </main>
-        {post.categoryId && (
+        {article.categoryId && (
           <RealtedArticles
-            categoryId={post.categoryId}
-            currentArticleId={post.id}
+            categoryId={article.categoryId}
+            currentArticleId={article.id}
           />
         )}
       </section>

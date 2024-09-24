@@ -31,4 +31,9 @@ module.exports = {
     "node_modules/",
   ],
   overrides: [{ files: ["*.js?(x)", "*.ts?(x)"] }],
+  rules: {
+    "no-unused-vars": "off",
+    "no-undef": "off",
+
+  },
 };

@@ -9,11 +9,12 @@ import {
   BreadcrumbPage,
 } from "@/components/ui/breadcrumb";
 import { Button } from "@/components/ui/button";
-import { formatToUtcTime } from "@/lib/dayjsExtend";
-import { prisma } from "@repo/database";
-import { highlightSearchText } from "@/lib/stringUtil";
+import { getArticleListByKeyword } from "@repo/database/services/article";
+
 import { cn } from "@/lib/utils";
 import Link from "next/link";
+import { formatToUtcTime } from "@repo/utils/dayjsUtil";
+import { highlightSearchText } from "@repo/utils/stringUtil";
 
 const SearchPage = async ({
   searchParams,
@@ -22,38 +23,7 @@ const SearchPage = async ({
     q: string;
   };
 }) => {
-  const articles = await prisma.article.findMany({
-    where: {
-      OR: [
-        {
-          title: {
-            contains: searchParams.q,
-          },
-        },
-        {
-          description: {
-            contains: searchParams.q,
-          },
-        },
-      ],
-
-      published: true,
-    },
-    take: 10,
-    select: {
-      id: true,
-      title: true,
-      description: true,
-      publishedAt: true,
-      categoryId: true,
-      savedAt: true,
-      Category: {
-        select: {
-          name: true,
-        },
-      },
-    },
-  });
+  const { data: articles } = await getArticleListByKeyword(searchParams.q);
 
   return (
     <main>
@@ -78,8 +48,8 @@ const SearchPage = async ({
             </BreadcrumbList>
           </Breadcrumb>
           <div className="space-y-4">
-            {articles.length ? (
-              articles.map((article, index) => (
+            {articles?.length ? (
+              articles?.map((article, index) => (
                 <div
                   key={article.id}
                   className={cn("py-4", {
@@ -89,9 +59,9 @@ const SearchPage = async ({
                 >
                   <div className="flex justify-between">
                     <h3>{article.title}</h3>
-                    {article.publishedAt && (
+                    {article.updatedAt && (
                       <span className="text-muted-foreground">
-                        {formatToUtcTime(article.publishedAt)}
+                        {formatToUtcTime(article.updatedAt)}
                       </span>
                     )}
                   </div>
@@ -100,12 +70,12 @@ const SearchPage = async ({
                     dangerouslySetInnerHTML={{
                       __html: highlightSearchText(
                         article.description,
-                        searchParams.q
+                        searchParams.q,
                       ),
                     }}
                   ></p>
                   <Link href={`/faq/${article.categoryId}`}>
-                    <Button size="sm">{article.Category?.name}</Button>
+                    <Button size="sm">{article.category?.name}</Button>
                   </Link>
                 </div>
               ))
