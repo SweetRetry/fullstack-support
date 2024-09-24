@@ -50,7 +50,7 @@ const page = async ({ params }: { params: { id: string } }) => {
     <main className="mt-6 flex">
       {article.categoryId && <CategoryMenu categoryId={article.categoryId} />}
       <section className="flex flex-1 px-8">
-        <main className="flex-grow">
+        <main className="flex-grow space-y-4">
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem>
