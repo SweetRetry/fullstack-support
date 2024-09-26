@@ -17,8 +17,10 @@ import FloatingLinkEditorPlugin from "./plugins/FloatingLinkEditorPlugin";
 import LinkPlugin from "./plugins/LinkPlugin";
 
 import dynamic from "next/dynamic";
+import { useTranslations } from "next-intl";
 const ImagesPlugin = dynamic(() => import("./plugins/ImagesPlugin"));
 function Editor() {
+  const t = useTranslations();
   const [floatingAnchorElem, setFloatingAnchorElem] =
     useState<HTMLDivElement | null>(null);
 
@@ -44,7 +46,7 @@ function Editor() {
                 aria-placeholder="Enter some rich text..."
                 placeholder={
                   <div className="editor-placeholder">
-                    Enter some rich text...
+                    {t("enter-some-rich-text")}
                   </div>
                 }
               />

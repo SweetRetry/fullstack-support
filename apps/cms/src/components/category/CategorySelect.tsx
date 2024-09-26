@@ -20,12 +20,16 @@ import {
   getCategoryList,
 } from "@repo/database/services/category";
 import { useToast } from "@/hooks/use-toast";
+import { useTranslations } from "next-intl";
 
 const CategorySelect = ({
   onSelect,
+  locale,
 }: {
   onSelect: (value: string, category: Category) => void;
+  locale: string;
 }) => {
+  const t = useTranslations();
   const [searchValue, setSearchValue] = useState("");
   const [value, setValue] = useState("");
 
@@ -37,13 +41,12 @@ const CategorySelect = ({
   const { toast } = useToast();
 
   const onAddCatrgory = async () => {
-    const category = await postCreateNewCategory(newCategoryName);
+    const category = await postCreateNewCategory(newCategoryName, locale);
     if (category.id) {
       setCategories([...categories, category]);
     } else {
       toast({
-        title: "Error",
-        description: "Create category failed",
+        title: t("create-new-category-failed"),
       });
     }
     setNewCategoryName("");
@@ -64,18 +67,18 @@ const CategorySelect = ({
   );
 
   useEffect(() => {
-    onSearchValueChange('');
+    onSearchValueChange("");
   }, []);
 
   return (
     <Command>
       <CommandInput
-        placeholder="Search category..."
+        placeholder={t("search-category")}
         value={searchValue}
         onValueChange={(value) => onSearchValueChange(value)}
       />
       <CommandList>
-        <CommandEmpty>No category found.</CommandEmpty>
+        <CommandEmpty>{t("no-category-found")}</CommandEmpty>
         <CommandGroup>
           {categories.map((category) => (
             <CommandItem
@@ -105,17 +108,17 @@ const CategorySelect = ({
             onChange={(e) => setNewCategoryName(e.target.value)}
             suffixIcon={
               <Button size="sm" onClick={onAddCatrgory}>
-                Add
+                {t("add")}
               </Button>
             }
           />
         ) : (
           <div
-            className="mt-2 flex cursor-pointer items-center justify-center rounded border border-dotted border-border py-2 text-muted-foreground hover:bg-muted"
+            className="mt-2 flex cursor-pointer items-center justify-center rounded border border-dotted border-border py-1 text-muted-foreground hover:bg-muted"
             onClick={() => setCreating(true)}
           >
             <Plus className="mr-2 h-4 w-4" />
-            <span>Add new category </span>
+            <span>{t("add-new-category")} </span>
           </div>
         )}
       </div>

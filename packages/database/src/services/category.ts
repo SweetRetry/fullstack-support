@@ -65,7 +65,7 @@ export async function postCreateNewCategory(
   newCategoryName: string,
   language: string
 ) {
-  await prisma.$transaction(async (_prisma) => {
+  return await prisma.$transaction(async (_prisma) => {
     const newCategory = await _prisma.category.create({
       data: {
         name: newCategoryName,

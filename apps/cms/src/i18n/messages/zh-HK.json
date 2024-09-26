@@ -80,5 +80,18 @@
   "under-review": "審核中",
   "unpublished": "未發表",
   "timed-releases": "定時發布",
-  "recent-published": "最近發表"
+  "recent-published": "最近發表",
+  "create-new-category-failed": "建立新類別失敗",
+  "no-category-found": "未找到類別。",
+  "add": "添加",
+  "add-new-category": "新增類別",
+  "enter-some-rich-text": "輸入一些富文本...",
+  "article-title": "文章標題",
+  "enter-the-article-title": "輸入文章標題",
+  "article-description": "文章描述",
+  "enter-the-article-description": "輸入文章描述",
+  "you-can-customize-the-article-description": "您可以自訂文章描述。",
+  "pulishing-category": "出版類別",
+  "select-language": "選擇語言",
+  "search-category": "搜尋類別"
 }

@@ -80,5 +80,18 @@
   "under-review": "Under review",
   "unpublished": "Unpublished",
   "recent-published": "Recent published",
-  "timed-releases": "Timed releases"
+  "timed-releases": "Timed releases",
+  "create-new-category-failed": "Create new category failed",
+  "no-category-found": "No category found.",
+  "add": "Add",
+  "add-new-category": "Add new category",
+  "enter-some-rich-text": "Enter some rich text...",
+  "article-title": "Article title",
+  "enter-the-article-title": "Enter the article title",
+  "article-description": "Article description",
+  "enter-the-article-description": "Enter the article description",
+  "you-can-customize-the-article-description": "You can customize the article description.",
+  "pulishing-category": "Pulishing category",
+  "select-language": "Select language",
+  "search-category": "Search category..."
 }
