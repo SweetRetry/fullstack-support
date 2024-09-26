@@ -21,41 +21,45 @@ import {
 } from "@/components/ui/form";
 import { Textarea } from "@/components/ui/textarea";
 
-import { useWindowUnload } from "@/hooks/useWindowUnload";
 import Editor from "./Editor";
 import { useEditorForm } from "./useEditorForm";
 import {
-  postSaveActical,
+  postCreateArticle,
   putUpdateArticle,
 } from "@repo/database/services/article";
 import { getToken } from "@/lib/tokenUtil";
 import { useToast } from "@/hooks/use-toast";
 import ButtonLoading from "../ui-extends/ButtonLoading";
+import { Select, SelectContent, SelectItem, SelectTrigger } from "../ui/select";
+import { SelectValue } from "@radix-ui/react-select";
+import { localeArray } from "@/i18n/config";
+import { useTranslations } from "next-intl";
 
-function EditorForm({ id }: { id: string }) {
-  const { form, title, categoryId, editor, status } = useEditorForm(id);
+function EditorForm({ id, locale }: { id: string; locale: string }) {
+  const t = useTranslations();
+
+  const { form, title, categoryId, editor, status } = useEditorForm(id, locale);
 
   const [articleId, setArticleId] = useState(id === "new" ? "" : id);
-
-  const { toast } = useToast();
-
+  const [loading, setLoading] = useState(false);
+  const [language, setLanguage] = useState(id === "new" ? "" : locale);
+  const [open, setOpen] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
 
   const router = useRouter();
 
-  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   const onSave = async ({
     onSuccess,
   }: {
     onSuccess?: (
-      res: Awaited<ReturnType<typeof postSaveActical>> & {
+      res: Awaited<ReturnType<typeof postCreateArticle>> & {
         data: Article;
       },
     ) => void;
-    onFailed?: (res: Awaited<ReturnType<typeof postSaveActical>>) => void;
+    onFailed?: (res: Awaited<ReturnType<typeof postCreateArticle>>) => void;
   }) => {
-    setLoading(true);
     const content = editor.getEditorState().toJSON();
     let _description: string = form.getValues("description") || "";
 
@@ -68,14 +72,26 @@ function EditorForm({ id }: { id: string }) {
       });
     }
 
-    if (!title && !_description) return;
+    if (!title && !_description)
+      return toast({
+        variant: "destructive",
+        title: t('please-enter-a-title-or-content'),
+      });
+
+    if (!language) {
+      setOpen(true);
+      return;
+    }
+
+    setLoading(true);
 
     if (!articleId) {
-      const res = await postSaveActical(
+      const res = await postCreateArticle(
         {
           title: title,
           content: JSON.stringify(content),
           description: _description,
+          language,
         },
         getToken(),
       );
@@ -88,6 +104,7 @@ function EditorForm({ id }: { id: string }) {
         {
           id: articleId,
           title,
+          language,
           content: JSON.stringify(content),
           description: _description,
         },
@@ -102,7 +119,7 @@ function EditorForm({ id }: { id: string }) {
     setLoading(false);
   };
 
-  const onSaveWrapper = () =>
+  const onSaveWrapper = () => {
     onSave({
       onSuccess(res) {
         if (!articleId) {
@@ -116,6 +133,7 @@ function EditorForm({ id }: { id: string }) {
         });
       },
     });
+  };
 
   const onPrepareReview = () =>
     onSave({
@@ -134,6 +152,7 @@ function EditorForm({ id }: { id: string }) {
         id: articleId,
         categoryId,
         title,
+        language,
         description: form.getValues("description"),
         status: ArticleStatus.UNDER_REVIEW,
         updatedAt: new Date(),
@@ -153,7 +172,7 @@ function EditorForm({ id }: { id: string }) {
 
   return (
     <main className="container rounded bg-background">
-      {articleId && <span>Your article has been saved by the system</span>}
+      {articleId && <span>{t('the-article-has-been-saved-by-the-system')}</span>}
       <header className="flex h-16 items-center justify-between px-6">
         <Input
           className="h-12 max-w-[60%] rounded-none border-0 p-0 text-xl placeholder:text-xl focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -167,11 +186,11 @@ function EditorForm({ id }: { id: string }) {
             onClick={onSaveWrapper}
             loading={loading}
           >
-            Save
+            {t('save')}
           </ButtonLoading>
           {status === ArticleStatus.DRAFT && (
             <ButtonLoading loading={loading} onClick={() => onPrepareReview()}>
-              Review
+              {t('review')}
             </ButtonLoading>
           )}
         </div>
@@ -253,6 +272,30 @@ function EditorForm({ id }: { id: string }) {
             </Button>
             <Button onClick={onReview}>Review</Button>
           </div>
+        </div>
+      </Modal>
+
+      <Modal title="Select Language" open={open} setOpen={setOpen}>
+        <Select value={language} onValueChange={(value) => setLanguage(value)}>
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {localeArray.map((item) => (
+              <SelectItem key={item.value} value={item.value}>
+                {item.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <div className="mt-4 space-x-2 text-right">
+          <Button variant="secondary" onClick={() => setOpen(false)}>
+            取消
+          </Button>
+          <ButtonLoading loading={loading} onClick={onSaveWrapper}>
+            保存
+          </ButtonLoading>
         </div>
       </Modal>
     </main>

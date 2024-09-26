@@ -1,0 +1,9 @@
+# *
+User-agent: *
+Allow: /
+
+# Host
+Host: https://pro.exworth.local
+
+# Sitemaps
+Sitemap: https://pro.exworth.local/sitemap.xml

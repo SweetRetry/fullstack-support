@@ -18,30 +18,34 @@ model User {
 }
 
 model Role {
-  id          String       @id @default(cuid())
-  name        String       @unique
+  id          String   @id @default(cuid())
+  name        String   @unique
   description String?
-  editable    Boolean      @default(true)
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @default(now())
+  editable    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @default(now())
+
   permissions Permission[] @relation(name: "RolePermissions")
   User        User[]
 }
 
 model Permission {
-  id          String  @id @default(cuid())
-  name        String  @unique
-  description String?
-  roles       Role[]  @relation(name: "RolePermissions")
+  id   String @id @default(cuid())
+  name String @unique
+
+  roles Role[] @relation(name: "RolePermissions")
 }
 
 model Category {
-  id        String    @id @default(cuid())
+  id        String   @default(cuid())
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
   name      String
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
-  articles  Article[]
+  language  String   @default("en-US")
 
+  articles Article[]
+
+  @@id([id, language])
   @@map("categories")
 }
 
@@ -55,13 +59,19 @@ enum ArticleStatus {
 }
 
 model Article {
-  id          String        @id @default(cuid())
-  title       String
-  content     String        @db.LongText
-  description String        @db.Text
-  status      ArticleStatus @default(DRAFT)
-  createdAt   DateTime      @default(now()) @map("created_at")
-  updatedAt   DateTime      @updatedAt @map("updated_at")
-  category    Category?     @relation(fields: [categoryId], references: [id])
-  categoryId  String?
+  id           String        @default(cuid())
+  title        String
+  content      String        @db.LongText
+  description  String        @db.Text
+  status       ArticleStatus @default(DRAFT)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  language     String        @default("en-US")
+  categoryId   String?
+  categoryLang String?
+
+  category Category? @relation(fields: [categoryId, categoryLang], references: [id, language])
+
+  @@id([id, language])
+  @@unique([title, language])
 }

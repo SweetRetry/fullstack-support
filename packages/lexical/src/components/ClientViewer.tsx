@@ -72,10 +72,7 @@ const ClientViewer = ({ article }: { article: Article }) => {
           </p>
         </div>
 
-        <p className="mt-2 text-muted-foreground">
-          <span>Description: </span>
-          {article.description}
-        </p>
+        <p className="mt-2 text-muted-foreground">{article.description}</p>
       </div>
 
       <div className="py-2">

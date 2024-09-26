@@ -7,11 +7,15 @@ const ThemeToggle = () => {
   return (
     <div>
       <Sun
-        className="h-[1.2rem] w-[1.2rem] transition-all dark:hidden hover:text-primary cursor-pointer"
+        className="cursor-pointer transition-all hover:text-primary dark:hidden"
+        width={20}
+        height={20}
         onClick={() => setTheme("dark")}
       />
       <Moon
-        className="h-[1.2rem] w-[1.2rem] transition-all hidden dark:block hover:text-primary cursor-pointer"
+        className="hidden cursor-pointer transition-all hover:text-primary dark:block"
+        width={20}
+        height={20}
         onClick={() => setTheme("light")}
       />
     </div>

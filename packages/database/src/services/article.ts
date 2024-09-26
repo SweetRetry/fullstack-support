@@ -6,11 +6,14 @@ import { IResponse } from "../utils/responseUtil";
 import { StatusCodes } from "http-status-codes";
 import RedisClient from "@repo/redis";
 
-export async function getArticle(id: string) {
+export async function getArticle(id: string, language: string) {
   try {
     const article = await prisma.article.findUnique({
       where: {
-        id,
+        id_language: {
+          id,
+          language,
+        },
       },
     });
     return IResponse.Success<Article | null>(article);
@@ -33,6 +36,7 @@ export async function getArticleList(params: {
   status?: ArticleStatus;
   keyword?: string;
   categoryId?: string;
+  language: string;
 }) {
   try {
     const wherePattern = {
@@ -52,6 +56,7 @@ export async function getArticleList(params: {
         : undefined,
       status: params.status,
       categoryId: params.categoryId,
+      language: params.language,
     };
     const listFn = prisma.article.findMany({
       take: params.pageSize,
@@ -115,7 +120,10 @@ export async function getArticleList(params: {
   }
 }
 
-export async function deleteArticle(data: { id: string }, token: string) {
+export async function deleteArticle(
+  data: { id: string; language: string },
+  token: string
+) {
   try {
     const hasPermission = await PermissionUtil.checkPermission(
       token,
@@ -126,7 +134,7 @@ export async function deleteArticle(data: { id: string }, token: string) {
     }
     const deletedArticle = await prisma.article.update({
       where: {
-        id: data.id,
+        id_language: data,
       },
       data: {
         status: ArticleStatus.DELETED,
@@ -139,11 +147,12 @@ export async function deleteArticle(data: { id: string }, token: string) {
   }
 }
 
-export async function postSaveActical(
+export async function postCreateArticle(
   data: {
     title: string;
     content: string;
     description: string;
+    language?: string;
   },
   token: string
 ) {
@@ -181,6 +190,7 @@ export async function postSaveActical(
 export async function putUpdateArticle(
   data: Partial<Article> & {
     id: string;
+    language: string;
   },
   token: string
 ) {
@@ -196,7 +206,10 @@ export async function putUpdateArticle(
 
     const updatedArticle = await prisma.article.update({
       where: {
-        id: data.id,
+        id_language: {
+          id: data.id,
+          language: data.language,
+        },
       },
       data,
     });
@@ -250,7 +263,12 @@ export async function getArticleListByKeyword(keyword: string) {
 }
 
 export async function postPulishArticle(
-  data: { id: string; type: "now" | "future"; expiredAt?: string },
+  data: {
+    id: string;
+    type: "now" | "future";
+    expiredAt?: string;
+    language: string;
+  },
   token: string
 ) {
   const hasPermission = await PermissionUtil.checkPermission(
@@ -266,7 +284,10 @@ export async function postPulishArticle(
     if (data.type === "future" && data.expiredAt) {
       const pendingArticle = await prisma.article.update({
         where: {
-          id: data.id,
+          id_language: {
+            id: data.id,
+            language: data.language,
+          },
         },
         data: {
           status: ArticleStatus.PENDING,
@@ -285,7 +306,10 @@ export async function postPulishArticle(
   try {
     const published = await prisma.article.update({
       where: {
-        id: data.id,
+        id_language: {
+          id: data.id,
+          language: data.language,
+        },
       },
       data: {
         status: ArticleStatus.PUBLISHED,

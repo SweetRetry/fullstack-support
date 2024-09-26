@@ -13,7 +13,6 @@ import { CodeHighlightNode, CodeNode } from "@lexical/code";
 import EditorForm from "./EditorForm";
 import "./theme.css";
 import { ImageNode } from "@repo/lexical/nodes/ImageNode";
-import { ArticleStatus } from "@prisma/client";
 
 const editorConfig: InitialConfigType = {
   namespace: "Article Editor",
@@ -37,10 +36,16 @@ const editorConfig: InitialConfigType = {
   ],
 };
 
-export default function EditorApp({ id }: { id: string }) {
+export default function EditorApp({
+  id,
+  locale,
+}: {
+  id: string;
+  locale: string;
+}) {
   return (
     <LexicalComposer initialConfig={editorConfig}>
-      <EditorForm id={id} />
+      <EditorForm id={id} locale={locale} />
     </LexicalComposer>
   );
 }
