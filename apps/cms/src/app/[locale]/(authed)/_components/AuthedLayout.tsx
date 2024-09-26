@@ -44,7 +44,7 @@ const AuthedLayout = ({ children }: { children: React.ReactNode }) => {
     <AuthProvider token={token}>
       <section className="flex h-full">
         <aside className="w-[200px] space-y-2 p-4">
-          <h2 className="mb-4 text-center text-2xl font-bold">SweetRetry</h2>
+          <h2 className="mb-4 text-center text-2xl font-bold">Exworth</h2>
           <SiteMenu menus={menus} activePath={`/${activePath}`} />
         </aside>
         <main className="flex h-full w-full transform flex-col">

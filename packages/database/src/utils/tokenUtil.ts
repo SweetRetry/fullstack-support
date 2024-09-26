@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 
 export class TokenUtil {
-  private static secret: string = "sweetRetry_faq_jwt";
+  private static secret: string = process.env.JWT_SECRET!;
 
   private static expiresIn = "3d";
   static generateToken(userId: string, roleId: string | null): string {
