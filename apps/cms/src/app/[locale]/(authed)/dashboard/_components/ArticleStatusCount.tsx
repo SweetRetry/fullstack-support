@@ -23,18 +23,18 @@ const ArticleStatusCount = () => {
     run();
   }, []);
   return (
-    <ul className="-mx-4 flex items-center">
-      <div className="basis-1/4 px-4">
+    <ul className="-mx-4 flex items-center flex-1">
+      <div className="basis-1/3 px-4">
         <li className="rounded border border-border p-4">
           <div className="mb-4 flex items-center justify-between">
             <p>{t("total-published")}</p>
             <Book />
           </div>
           <p className="text-2xl font-bold">
-            {t("count-article", { count: data?.total })}
+            {t("count-article", { count: data?.total || 0 })}
           </p>
           <p className="text-muted-foreground">
-            + {t("count-increase-from-yesterday", { count: data?.increase })}
+            {t("count-increase-from-yesterday", { count: data?.increase || 0 })}
           </p>
         </li>
       </div>

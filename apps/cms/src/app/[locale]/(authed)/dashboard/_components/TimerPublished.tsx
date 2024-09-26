@@ -40,9 +40,7 @@ const TimerPublished = ({ locale }: { locale: string }) => {
   }, []);
 
   return (
-    <section className="w-1/2 rounded-lg border border-solid border-border p-4">
-      <h3 className="text-xl font-bold">{t("timer-published")}</h3>
-
+    <section className="rounded-lg">
       <List
         loading={loading}
         dataSource={pendingArticles}

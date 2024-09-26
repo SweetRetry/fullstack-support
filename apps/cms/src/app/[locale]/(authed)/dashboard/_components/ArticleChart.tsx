@@ -61,13 +61,11 @@ const ArticleChart = () => {
   }, []);
 
   return (
-    <div className="w-fit border border-border p-4">
-      <div
-        id="article-pie-chart"
-        style={{ width: 650, height: 400 }}
-        className="w-full"
-      ></div>
-    </div>
+    <div
+      id="article-pie-chart"
+      style={{ width: 400, height: 130 }}
+      className="w-full"
+    ></div>
   );
 };
 
