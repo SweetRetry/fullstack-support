@@ -75,7 +75,7 @@ function EditorForm({ id, locale }: { id: string; locale: string }) {
     if (!title && !_description)
       return toast({
         variant: "destructive",
-        title: t('please-enter-a-title-or-content'),
+        title: t("please-enter-a-title-or-content"),
       });
 
     if (!language) {
@@ -172,7 +172,9 @@ function EditorForm({ id, locale }: { id: string; locale: string }) {
 
   return (
     <main className="container rounded bg-background">
-      {articleId && <span>{t('the-article-has-been-saved-by-the-system')}</span>}
+      {articleId && (
+        <span>{t("the-article-has-been-saved-by-the-system")}</span>
+      )}
       <header className="flex h-16 items-center justify-between px-6">
         <Input
           className="h-12 max-w-[60%] rounded-none border-0 p-0 text-xl placeholder:text-xl focus-visible:ring-0 focus-visible:ring-offset-0"
@@ -186,11 +188,11 @@ function EditorForm({ id, locale }: { id: string; locale: string }) {
             onClick={onSaveWrapper}
             loading={loading}
           >
-            {t('save')}
+            {t("save")}
           </ButtonLoading>
           {status === ArticleStatus.DRAFT && (
             <ButtonLoading loading={loading} onClick={() => onPrepareReview()}>
-              {t('review')}
+              {t("review")}
             </ButtonLoading>
           )}
         </div>
@@ -212,13 +214,13 @@ function EditorForm({ id, locale }: { id: string; locale: string }) {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Article Title</FormLabel>
+                    <FormLabel>{t("article-title")}</FormLabel>
 
                     <FormControl>
                       <Input
                         {...field}
                         autoComplete="off"
-                        placeholder="Enter the article title"
+                        placeholder={t("enter-the-article-title")}
                       />
                     </FormControl>
                   </FormItem>
@@ -230,15 +232,15 @@ function EditorForm({ id, locale }: { id: string; locale: string }) {
                 control={form.control}
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Article Description</FormLabel>
+                    <FormLabel>{t("article-description")}</FormLabel>
                     <FormControl>
                       <Textarea
                         {...field}
-                        placeholder="Enter the article description"
+                        placeholder={t("enter-the-article-description")}
                       />
                     </FormControl>
                     <FormDescription>
-                      You can customize the article description.
+                      {t("you-can-customize-the-article-description")}
                     </FormDescription>
                   </FormItem>
                 )}
@@ -249,11 +251,12 @@ function EditorForm({ id, locale }: { id: string; locale: string }) {
                 control={form.control}
                 render={() => (
                   <FormItem>
-                    <FormLabel>Pulishing Category</FormLabel>
+                    <FormLabel>{t("pulishing-category")}</FormLabel>
 
                     <FormControl>
                       <div className="rounded border border-solid border-input">
                         <CategorySelect
+                          locale={locale}
                           onSelect={(value) => {
                             form.setValue("categoryId", value);
                           }}
@@ -268,14 +271,14 @@ function EditorForm({ id, locale }: { id: string; locale: string }) {
 
           <div className="mt-4 flex justify-end gap-2">
             <Button variant="secondary" onClick={() => setModalOpen(false)}>
-              Cancel
+              {t("cancel")}
             </Button>
-            <Button onClick={onReview}>Review</Button>
+            <Button onClick={onReview}>{t("review")}</Button>
           </div>
         </div>
       </Modal>
 
-      <Modal title="Select Language" open={open} setOpen={setOpen}>
+      <Modal title={t("select-language")} open={open} setOpen={setOpen}>
         <Select value={language} onValueChange={(value) => setLanguage(value)}>
           <SelectTrigger>
             <SelectValue />
@@ -291,10 +294,10 @@ function EditorForm({ id, locale }: { id: string; locale: string }) {
 
         <div className="mt-4 space-x-2 text-right">
           <Button variant="secondary" onClick={() => setOpen(false)}>
-            取消
+            {t("cancel")}
           </Button>
           <ButtonLoading loading={loading} onClick={onSaveWrapper}>
-            保存
+            {t("save")}
           </ButtonLoading>
         </div>
       </Modal>

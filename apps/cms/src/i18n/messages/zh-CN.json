@@ -80,5 +80,18 @@
   "under-review": "审核中",
   "unpublished": "未发表",
   "timed-releases": "定时发布",
-  "recent-published": "最近发布"
+  "recent-published": "最近发布",
+  "create-new-category-failed": "创建新类别失败",
+  "no-category-found": "未找到类别。",
+  "add": "添加",
+  "add-new-category": "添加新类别",
+  "enter-some-rich-text": "输入一些富文本...",
+  "article-title": "文章标题",
+  "enter-the-article-title": "输入文章标题",
+  "article-description": "文章描述",
+  "enter-the-article-description": "输入文章描述",
+  "you-can-customize-the-article-description": "您可以自定义文章描述。",
+  "pulishing-category": "出版类别",
+  "select-language": "选择语言",
+  "search-category": "搜索类别"
 }

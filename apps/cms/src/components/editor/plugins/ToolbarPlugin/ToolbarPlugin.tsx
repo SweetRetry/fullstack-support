@@ -52,7 +52,6 @@ import { BlockType, blockTypeToBlockNameMap } from "./tool";
 import { $isParentElementRTL } from "@lexical/selection";
 import { InsertImageDialog } from "../ImagesPlugin";
 import { Modal } from "@/components/ui-extends/Modal";
-import dynamic from "next/dynamic";
 
 export default function ToolbarPlugin({
   setIsLinkEditMode,
