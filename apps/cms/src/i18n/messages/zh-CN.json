@@ -4,7 +4,7 @@
   "email": "电子邮件",
   "password": "密码",
   "total-published": "已发表总数",
-  "count-increase-from-yesterday": "比昨天增加 {count} ",
+  "count-increase-from-yesterday": "+ 较昨天增长 {count} 篇",
   "count-article": "{count} 篇文章",
   "recently-published": "最近发布",
   "dashboard": "仪表板",
@@ -78,5 +78,7 @@
   "pending": "待办的",
   "published": "已发表",
   "under-review": "审核中",
-  "unpublished": "未发表"
+  "unpublished": "未发表",
+  "timed-releases": "定时发布",
+  "recent-published": "最近发布"
 }

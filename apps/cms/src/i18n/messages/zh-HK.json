@@ -4,7 +4,7 @@
   "email": "電子郵件",
   "password": "密碼",
   "total-published": "已發表總數",
-  "count-increase-from-yesterday": "比昨天增加 {count} ",
+  "count-increase-from-yesterday": "+ 較昨天增長 {count} 篇",
   "count-article": "{count} 篇文章",
   "recently-published": "最近發布",
   "dashboard": "儀表板",
@@ -78,5 +78,7 @@
   "pending": "待辦的",
   "published": "已發表",
   "under-review": "審核中",
-  "unpublished": "未發表"
+  "unpublished": "未發表",
+  "timed-releases": "定時發布",
+  "recent-published": "最近發表"
 }

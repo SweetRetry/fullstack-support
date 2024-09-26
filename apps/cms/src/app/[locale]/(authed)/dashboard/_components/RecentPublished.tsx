@@ -34,9 +34,7 @@ const RecentPublished = ({ locale }: { locale: string }) => {
   }, []);
 
   return (
-    <section className="flex-1 rounded-lg border border-solid border-border p-4">
-      <h3 className="text-xl font-bold">{t("recently-published")}</h3>
-
+    <section className="flex-1 rounded-lg">
       <List
         loading={loading}
         dataSource={data}

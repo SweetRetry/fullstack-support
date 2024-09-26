@@ -4,15 +4,31 @@ import RecentPublished from "./_components/RecentPublished";
 import ArticleChart from "./_components/ArticleChart";
 import TimerPublished from "./_components/TimerPublished";
 import ArticleStatusCount from "./_components/ArticleStatusCount";
+import { Tabs, TabsProps } from "antd";
+import { useTranslations } from "next-intl";
 const page = ({ params: { locale } }: { params: { locale: string } }) => {
+  const t = useTranslations();
+  const items: TabsProps["items"] = [
+    {
+      key: "1",
+      label: t("recent-published"),
+      children: <RecentPublished locale={locale} />,
+    },
+    {
+      key: "2",
+      label: t("timed-releases"),
+      children: <TimerPublished locale={locale} />,
+    },
+  ];
+
   return (
-    <main className="space-y-8 px-16 py-4">
-      <ArticleStatusCount />
-      <div className="flex space-x-8">
+    <main className="container space-y-8 py-4">
+      <div className="flex justify-between">
+        <ArticleStatusCount />
         <ArticleChart />
-        <RecentPublished locale={locale} />
       </div>
-      <TimerPublished locale={locale} />
+
+      <Tabs items={items} className="w-full" />
     </main>
   );
 };

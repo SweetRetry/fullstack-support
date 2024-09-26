@@ -4,7 +4,7 @@
   "email": "Email",
   "password": "Password",
   "total-published": "Total Published",
-  "count-increase-from-yesterday": "{count} increase from yesterday",
+  "count-increase-from-yesterday": "+ {count} increase from yesterday",
   "count-article": "{count} article",
   "recently-published": "Recently Published",
   "dashboard": "Dashboard",
@@ -78,5 +78,7 @@
   "pending": "Pending",
   "published": "Published",
   "under-review": "Under review",
-  "unpublished": "Unpublished"
+  "unpublished": "Unpublished",
+  "recent-published": "Recent published",
+  "timed-releases": "Timed releases"
 }
