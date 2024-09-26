@@ -7,7 +7,7 @@ import { getArticle } from "@repo/database/services/article";
 import { LoadingSpinner } from "./LoadingSpinner";
 import ClientViewer from "@repo/lexical/components/ClientViewer";
 
-const ArticleViewer = ({ id }: { id?: string }) => {
+const ArticleViewer = ({ id, locale }: { id: string; locale: string }) => {
   const [article, setArticle] = useState<Article>();
 
   const [loading, setLoading] = useState(true);
@@ -17,7 +17,7 @@ const ArticleViewer = ({ id }: { id?: string }) => {
       setLoading(true);
       if (!id) return;
 
-      const res = await getArticle(id!);
+      const res = await getArticle(id, locale);
       if (res.data?.id) {
         setArticle(res.data);
       }

@@ -77,7 +77,6 @@ export const getRolePermissionsById = async (roleId: string) => {
       select: {
         id: true,
         name: true,
-        description: true,
       },
     });
 

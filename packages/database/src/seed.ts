@@ -1,28 +1,28 @@
+import { hash } from "crypto";
 import { prisma } from "./client";
 
 async function main() {
   // 创建权限
-  const createPermission = async (name: string, description: string) => {
+  const createPermission = async (name: string) => {
     return prisma.permission.create({
       data: {
         name,
-        description,
       },
     });
   };
 
   const permissions = await Promise.all([
-    createPermission("article:edit", "Editing Article"),
-    createPermission("article:review", "Reviewing Article"),
-    createPermission("article:publish", "Publishing Article"),
-    createPermission("article:delete", "Deleting Article"),
-    createPermission("role:create", "Creating Role"),
-    createPermission("role:edit", "Editing Role"),
-    createPermission("role:delete", "Deleting Role"),
-    createPermission("user:create", "Creating User"),
-    createPermission("user:edit", "Editing User"),
-    createPermission("user:delete", "Deleting User"),
-    createPermission("user:resetPassword", "Resetting Password"),
+    createPermission("article:edit"),
+    createPermission("article:review"),
+    createPermission("article:publish"),
+    createPermission("article:delete"),
+    createPermission("role:create"),
+    createPermission("role:edit"),
+    createPermission("role:delete"),
+    createPermission("user:create"),
+    createPermission("user:edit"),
+    createPermission("user:delete"),
+    createPermission("user:resetPassword"),
   ]);
 
   // 创建角色
@@ -37,11 +37,13 @@ async function main() {
     },
   });
 
+  const hashedPwd = hash("sha256", "admin123");
+
   // 创建用户
   await prisma.user.create({
     data: {
       email: "admin@test.com",
-      password: "admin123",
+      password: hashedPwd,
       role: {
         connect: role,
       },

@@ -7,7 +7,7 @@ import { useLexicalComposerContext } from "@lexical/react/LexicalComposerContext
 import { getArticle } from "@repo/database/services/article";
 import { ArticleStatus } from "@prisma/client";
 
-export const useEditorForm = (articalId: string) => {
+export const useEditorForm = (articalId: string, locale: string) => {
   const [status, setStatus] = useState<ArticleStatus | undefined>();
 
   const form = useForm({
@@ -32,7 +32,7 @@ export const useEditorForm = (articalId: string) => {
 
   useEffect(() => {
     async function run() {
-      const { data: existArticle } = await getArticle(articalId);
+      const { data: existArticle } = await getArticle(articalId, locale);
       if (existArticle?.id) {
         form.setValue("title", existArticle.title);
         form.setValue("description", existArticle.description);
@@ -49,6 +49,6 @@ export const useEditorForm = (articalId: string) => {
     title,
     categoryId,
     editor,
-    status
+    status,
   };
 };
