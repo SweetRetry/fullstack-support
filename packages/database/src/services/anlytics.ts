@@ -1,14 +1,31 @@
 "use server";
 
 import { StatusCodes } from "http-status-codes";
-import { prisma } from "../client";
+import { ArticleStatus, prisma } from "../client";
 import { IResponse } from "../utils/responseUtil";
+import dayjs from "dayjs";
 
-export async function getArticleAnlytics() {
+export async function getArticleAnlytics(language: string) {
   try {
-    const statusCounts = await prisma.article.groupBy({
-      by: "status",
-      _count: true,
+    let articles = await prisma.article.findMany({
+      where: {
+        language,
+      },
+    });
+    let statusCounts: Record<string, number> = {};
+    articles.forEach((item) => {
+      if (
+        item.status === ArticleStatus.PUBLISHED &&
+        dayjs(item.publishedAt).isAfter(dayjs())
+      ) {
+        statusCounts["PENDING"] = statusCounts["PENDING"]
+          ? statusCounts["PENDING"] + 1
+          : 1;
+      } else {
+        statusCounts[item.status] = statusCounts[item.status]
+          ? statusCounts[item.status] + 1
+          : 1;
+      }
     });
 
     return IResponse.Success(statusCounts);

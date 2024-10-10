@@ -25,7 +25,7 @@ const page = ({ params: { locale } }: { params: { locale: string } }) => {
     <main className="container space-y-8 py-4">
       <div className="flex justify-between">
         <ArticleStatusCount />
-        <ArticleChart />
+        <ArticleChart locale={locale} />
       </div>
 
       <Tabs items={items} className="w-full" />

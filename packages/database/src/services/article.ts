@@ -277,7 +277,7 @@ export async function postPulishArticle(
           },
         },
         data: {
-          status: ArticleStatus.PENDING,
+          status: ArticleStatus.PUBLISHED,
           publishedAt: new Date(data.expiredAt),
         },
       });
@@ -318,7 +318,7 @@ export async function getPendingArticles(pageSize: number) {
       publishedAt: {
         gte: new Date(),
       },
-      status: ArticleStatus.PENDING,
+      status: ArticleStatus.PUBLISHED,
     },
     take: pageSize ?? 5,
   });
