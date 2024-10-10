@@ -4,8 +4,9 @@ import React, { useEffect } from "react";
 import { EChartsOption, init } from "echarts";
 import { useTranslations } from "next-intl";
 import { useArticleTranslate } from "@/hooks/useArticle";
+import { ArticleStatus } from "@prisma/client";
 
-const ArticleChart = () => {
+const ArticleChart = ({ locale }: { locale: string }) => {
   const t = useTranslations();
   const { ArticleStatusTranslate } = useArticleTranslate();
 
@@ -43,14 +44,16 @@ const ArticleChart = () => {
 
   useEffect(() => {
     async function run() {
-      const res = await getArticleAnlytics();
+      const res = await getArticleAnlytics(locale);
       if (res.code === 200 && res.data) {
         const chartDom = document.getElementById("article-pie-chart");
         const myChart = init(chartDom);
-        (option.series as { data: any }[])[0].data = res.data?.map((item) => {
+        (option.series as { data: any }[])[0].data = Object.entries(
+          res.data,
+        ).map(([label, value]) => {
           return {
-            value: item._count,
-            name: ArticleStatusTranslate[item.status],
+            name: ArticleStatusTranslate[label],
+            value: value,
           };
         });
         myChart.setOption(option);
@@ -65,7 +68,7 @@ const ArticleChart = () => {
       id="article-pie-chart"
       style={{ width: 400, height: 130 }}
       className="w-full"
-    ></div>
+    />
   );
 };
 
