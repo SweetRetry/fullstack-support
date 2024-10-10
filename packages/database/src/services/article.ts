@@ -4,7 +4,6 @@ import { PermissionUtil } from "../utils/authUtil";
 import { z } from "zod";
 import { IResponse } from "../utils/responseUtil";
 import { StatusCodes } from "http-status-codes";
-import RedisClient from "@repo/redis";
 
 export async function getArticle(id: string, language: string) {
   try {
@@ -77,18 +76,6 @@ export async function getArticleList(params: {
     });
 
     let [list, totalCount] = await Promise.all([listFn, totalCountFn]);
-
-    list = await Promise.all(
-      list.map(async (item) => {
-        if (item.status === ArticleStatus.PENDING) {
-          return {
-            ...item,
-            publishedAt: await RedisClient.get(`pending:article:${item.id}`),
-          };
-        }
-        return item;
-      })
-    );
 
     return IResponse.Success<{
       list: Array<{
@@ -291,9 +278,9 @@ export async function postPulishArticle(
         },
         data: {
           status: ArticleStatus.PENDING,
+          publishedAt: new Date(data.expiredAt),
         },
       });
-      RedisClient.set(`pending:article:${data.id}`, data.expiredAt);
       return IResponse.Success(pendingArticle);
     }
   } catch (err) {
@@ -326,14 +313,10 @@ export async function postPulishArticle(
 }
 
 export async function getPendingArticles(pageSize: number) {
-  const keys = await RedisClient.keys("pending:article:*");
-  console.log(keys);
-  if (!keys.length) return;
-
   const pendingArticles = await prisma.article.findMany({
     where: {
-      id: {
-        in: keys.map((key) => key.split(":")[2]),
+      publishedAt: {
+        gte: new Date(),
       },
       status: ArticleStatus.PENDING,
     },

@@ -31,7 +31,6 @@
     "@radix-ui/react-toast": "^1.2.1",
     "@repo/database": "workspace:*",
     "@repo/lexical": "workspace:*",
-    "@repo/redis": "workspace:*",
     "@repo/utils": "workspace:*",
     "@tanstack/react-table": "^8.20.1",
     "ahooks": "^3.8.1",

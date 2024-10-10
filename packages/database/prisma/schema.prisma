@@ -66,6 +66,7 @@ model Article {
   status       ArticleStatus @default(DRAFT)
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
+  publishedAt  DateTime?
   language     String        @default("en-US")
   categoryId   String?
   categoryLang String?
